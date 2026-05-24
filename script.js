@@ -6,6 +6,8 @@ import {
   , onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // 🔧 PUT YOUR FIREBASE CONFIG HERE
 const firebaseConfig = {
@@ -20,6 +22,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 console.log('script.js loaded');
 
 // Do not force sign-out on load; onAuthStateChanged will set the correct UI.
@@ -46,19 +49,40 @@ document.getElementById("signupBtn").onclick = () => {
     alert('Please enter email and password');
     return;
   }
-
   createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log('Account created', userCredential);
-      // After signup, prompt user to choose a username
-      if (authSection) authSection.style.display = 'none';
-      if (usernameSection) usernameSection.style.display = 'block';
+    .then(async (userCredential) => {
+      const user = userCredential.user;
+
+      // create user profile in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: email.split("@")[0],
+        email: email,
+        movies: [],
+        shows: [],
+        role: "user"
+      });
+
+      console.log("User saved to Firestore");
+      showApp(user);
     })
     .catch(err => {
       console.error(err);
       alert(err.message);
     });
 };
+
+// Helper to show app UI and set username display
+function showApp(user) {
+  // hide auth/username sections
+  if (authSection) authSection.style.display = 'none';
+  if (usernameSection) usernameSection.style.display = 'none';
+  // show app
+  if (appSection) appSection.style.display = 'block';
+
+  // set username display
+  const nameToShow = (user && (user.displayName || user.email && user.email.split('@')[0])) || '';
+  if (usernameDisplay) usernameDisplay.textContent = nameToShow;
+}
 
 // LOGIN
 document.getElementById("loginBtn").onclick = () => {
