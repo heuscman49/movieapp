@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Movie List</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- LOGIN SECTION -->
+  <div id="authSection" style="display:none;">
+    <h2>Login</h2>
+
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button id="signupBtn">Sign Up</button>
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <!-- USERNAME SETUP (shown after signup or if user has no displayName) -->
+  <div id="usernameSection" style="display:none;">
+    <h2>Choose a username</h2>
+    <input id="usernameInput" placeholder="Enter a username">
+    <button id="setUsernameBtn">Set Username</button>
+  </div>
+
+  <hr>
+
+  <!-- APP SECTION -->
+  <div id="appSection" style="display:none;">
+    <h1 id="welcomeHeader">Welcome <span id="usernameDisplay"></span> <button id="logoutBtn" style="margin-left:16px;">Logout</button></h1>
+
+    <h2>Movies to watch:</h2>
+    <ul id="moviesList"></ul>
+
+    <input id="movieInput" placeholder="Add movie">
+    <button onclick="addMovie()">Add</button>
+
+    <h2>Shows to watch:</h2>
+    <ul id="showsList"></ul>
+
+    <input id="showInput" placeholder="Add show">
+    <button onclick="addShow()">Add</button>
+  </div>
+
+  <script type="module" src="script.js"></script>
+
+</body>
+</html>
