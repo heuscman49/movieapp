@@ -35,23 +35,34 @@ onAuthStateChanged(auth, (user) => {
   } else {
     currentUser = null;
   }
-
 async function showUserData(uid) {
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
 
-  const dataDiv = document.getElementById("userData");
-  if (dataDiv) dataDiv.innerHTML = "";
+  const box = document.getElementById("userData");
 
-  if (snap.exists()) {
-    const data = snap.data();
-
-    if (dataDiv) dataDiv.innerHTML = `
-      <h4>${data.name}</h4>
-      <p><b>Movies:</b> ${data.movies?.join(", ") || "none"}</p>
-      <p><b>Shows:</b> ${data.shows?.join(", ") || "none"}</p>
-    `;
+  if (!snap.exists()) {
+    if (box) box.innerHTML = "User not found";
+    return;
   }
+
+  const data = snap.data();
+
+  if (box) box.innerHTML = `
+    <h3>👤 ${data.name}</h3>
+
+    <p><b>Email:</b> ${data.email}</p>
+
+    <h4>🎬 Movies</h4>
+    <ul>
+      ${(data.movies || []).map(m => `<li>${m}</li>`).join("")}
+    </ul>
+
+    <h4>📺 Shows</h4>
+    <ul>
+      ${(data.shows || []).map(s => `<li>${s}</li>`).join("")}
+    </ul>
+  `;
 }
 });
 
@@ -182,21 +193,33 @@ async function loadUserData() {
 }
 
 async function loadUsers() {
+  const adminPanel = document.getElementById("adminPanel");
+  if (adminPanel) adminPanel.style.display = "block";
   const snapshot = await getDocs(collection(db, "users"));
 
   const userList = document.getElementById("userList");
-  if (userList) userList.innerHTML = "";
+  if (!userList) return;
+  userList.innerHTML = "";
 
   snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
     const li = document.createElement("li");
 
-    li.textContent = docSnap.data().name || docSnap.id;
+    li.textContent = "👤 " + (data.name || docSnap.id);
 
-    li.onclick = () => {
-      if (typeof showUserData === 'function') showUserData(docSnap.id);
-    };
+    li.style.cursor = "pointer";
+    li.style.padding = "8px";
+    li.style.marginBottom = "5px";
+    li.style.background = "#eee";
+    li.style.borderRadius = "6px";
 
-    if (userList) userList.appendChild(li);
+    li.onmouseover = () => li.style.background = "#ddd";
+    li.onmouseout = () => li.style.background = "#eee";
+
+    li.onclick = () => showUserData(docSnap.id);
+
+    userList.appendChild(li);
   });
 }
 
