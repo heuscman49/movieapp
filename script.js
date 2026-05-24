@@ -68,9 +68,8 @@ async function showUserData(uid) {
 
 function checkAdmin(user) {
   if (user && user.email === "georgebossingto@gmail.com") {
-    const adminPanel = document.getElementById("adminPanel");
-    if (adminPanel) adminPanel.style.display = "block";
-    if (typeof loadUsers === 'function') loadUsers();
+    document.getElementById("adminPanel").style.display = "block";
+    loadUsers();
   }
 }
 
@@ -102,22 +101,18 @@ document.getElementById("signupBtn").onclick = () => {
     .then(async (userCredential) => {
       const user = userCredential.user;
 
-      // create user profile in Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: email.split("@")[0],
         email: email,
         movies: [],
-        shows: [],
-        role: "user"
+        shows: []
       });
 
-      console.log("User saved to Firestore");
-      showApp(user);
+      console.log("User added to Firestore");
+
+      showApp();
     })
-    .catch(err => {
-      console.error(err);
-      alert(err.message);
-    });
+    .catch(err => alert(err.message));
 };
 
 // Helper to show app UI and set username display
@@ -193,34 +188,37 @@ async function loadUserData() {
 }
 
 async function loadUsers() {
-  const adminPanel = document.getElementById("adminPanel");
-  if (adminPanel) adminPanel.style.display = "block";
+  console.log("🔄 loading users...");
+
   const snapshot = await getDocs(collection(db, "users"));
 
   const userList = document.getElementById("userList");
-  if (!userList) return;
   userList.innerHTML = "";
+
+  if (snapshot.empty) {
+    userList.innerHTML = "<li>❌ No users found in Firestore</li>";
+    return;
+  }
 
   snapshot.forEach((docSnap) => {
     const data = docSnap.data();
 
     const li = document.createElement("li");
 
-    li.textContent = "👤 " + (data.name || docSnap.id);
+    li.innerHTML = "👤 " + (data.name || docSnap.id);
 
-    li.style.cursor = "pointer";
     li.style.padding = "8px";
-    li.style.marginBottom = "5px";
+    li.style.marginBottom = "6px";
     li.style.background = "#eee";
     li.style.borderRadius = "6px";
-
-    li.onmouseover = () => li.style.background = "#ddd";
-    li.onmouseout = () => li.style.background = "#eee";
+    li.style.cursor = "pointer";
 
     li.onclick = () => showUserData(docSnap.id);
 
     userList.appendChild(li);
   });
+
+  console.log("✅ users loaded:", snapshot.size);
 }
 
 // LOGIN
