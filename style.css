@@ -3,3 +3,19 @@
 body {
   margin: 0;
 }
+
+/* Left login pane */
+#leftPane {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  padding: 20px;
+  background: #f0f0f0;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.05);
+}
+
+main, .content {
+  margin-left: 260px; /* leave space for left pane */
+}

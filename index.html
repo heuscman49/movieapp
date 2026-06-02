@@ -3,19 +3,43 @@
 <head>
   <title>Movie List</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* left pane for auth */
+    #leftPane {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 260px;
+      padding: 20px;
+      background: #f7f7f7;
+      border-right: 1px solid #ddd;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    /* push main content to the right when left pane is present */
+    body { margin-left: 260px; }
+    /* ensure authSection controls layout */
+    #authSection input { display: block; width: 100%; margin: 6px 0; padding: 8px; box-sizing: border-box; }
+    #authSection button { margin-right: 6px; }
+  </style>
 </head>
 
 <body>
 
-  <!-- LOGIN SECTION -->
-  <div id="authSection" style="display:none;">
-    <h2>Login</h2>
+  <!-- LOGIN SECTION (left pane) -->
+  <div id="leftPane">
+    <div id="authSection" style="display:none;">
+      <h2>Login</h2>
 
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+      <input id="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
 
-    <button id="signupBtn">Sign Up</button>
-    <button id="loginBtn">Login</button>
+      <div style="margin-top:8px;">
+        <button id="signupBtn">Sign Up</button>
+        <button id="loginBtn">Login</button>
+      </div>
+    </div>
   </div>
 
   <!-- USERNAME SETUP (shown after signup or if user has no displayName) -->
