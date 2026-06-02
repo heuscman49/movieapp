@@ -35,35 +35,6 @@ onAuthStateChanged(auth, (user) => {
   } else {
     currentUser = null;
   }
-async function showUserData(uid) {
-  const ref = doc(db, "users", uid);
-  const snap = await getDoc(ref);
-
-  const box = document.getElementById("userData");
-
-  if (!snap.exists()) {
-    if (box) box.innerHTML = "User not found";
-    return;
-  }
-
-  const data = snap.data();
-
-  if (box) box.innerHTML = `
-    <h3>👤 ${data.name}</h3>
-
-    <p><b>Email:</b> ${data.email}</p>
-
-    <h4>🎬 Movies</h4>
-    <ul>
-      ${(data.movies || []).map(m => `<li>${m}</li>`).join("")}
-    </ul>
-
-    <h4>📺 Shows</h4>
-    <ul>
-      ${(data.shows || []).map(s => `<li>${s}</li>`).join("")}
-    </ul>
-  `;
-}
 });
 
 function checkAdmin(user) {
@@ -135,7 +106,7 @@ async function showApp(user) {
   try {
     const activeUser = auth.currentUser || currentUser;
     const adminPanel = document.getElementById('adminPanel');
-    if (activeUser && activeUser.email === "your-email@example.com") {
+    if (activeUser && activeUser.email === "georgebossingto@gmail.com") {
       if (adminPanel) adminPanel.style.display = 'block';
     } else {
       if (adminPanel) adminPanel.style.display = 'none';
@@ -219,6 +190,36 @@ async function loadUsers() {
   });
 
   console.log("✅ users loaded:", snapshot.size);
+}
+
+async function showUserData(uid) {
+  const ref = doc(db, "users", uid);
+  const snap = await getDoc(ref);
+
+  const box = document.getElementById("userData");
+
+  if (!snap.exists()) {
+    if (box) box.innerHTML = "User not found";
+    return;
+  }
+
+  const data = snap.data();
+
+  if (box) box.innerHTML = `
+    <h3>👤 ${data.name}</h3>
+
+    <p><b>Email:</b> ${data.email}</p>
+
+    <h4>🎬 Movies</h4>
+    <ul>
+      ${(data.movies || []).map(m => `<li>${m}</li>`).join("")}
+    </ul>
+
+    <h4>📺 Shows</h4>
+    <ul>
+      ${(data.shows || []).map(s => `<li>${s}</li>`).join("")}
+    </ul>
+  `;
 }
 
 // LOGIN
