@@ -452,7 +452,7 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
   }
 
   const res = await fetch(
-    `https://api.themoviedb.org/3/search/multi?query=${query}&api_key=YOUR_API_KEY`
+      `https://api.themoviedb.org/3/search/multi?query=${query}&api_key=608767c8f52970a29bb38126d419116e`
   );
 
   const data = await res.json();
