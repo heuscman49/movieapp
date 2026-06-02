@@ -38,6 +38,8 @@ onAuthStateChanged(auth, (user) => {
     if (appSection) appSection.style.display = 'none';
   }
 
+});
+
 async function searchMovies(query) {
   const res = await fetch(
       `https://api.themoviedb.org/3/search/multi?query=${query}&api_key=608767c8f52970a29bb38126d419116e`
@@ -126,7 +128,7 @@ async function loadWatched() {
     container.appendChild(div);
   });
 }
-});
+
 
 function checkAdmin(user) {
   if (user && user.email === "georgebossingto@gmail.com") {
