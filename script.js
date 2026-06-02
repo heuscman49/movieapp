@@ -259,26 +259,62 @@ async function loadUserData() {
     // set username from Firestore if present
     if (data.name && usernameDisplay) usernameDisplay.textContent = data.name;
 
-    // populate movies
+    // populate movies (handle objects)
     const movies = Array.isArray(data.movies) ? data.movies : [];
     const moviesList = document.getElementById('moviesList');
     if (moviesList) {
       moviesList.innerHTML = '';
       movies.forEach(m => {
+        const title = (m && typeof m === 'object') ? (m.title || m.name || 'Untitled') : m;
         const li = document.createElement('li');
-        li.innerHTML = m + ' <button onclick="this.parentElement.remove()">delete</button>';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = title;
+
+        const reviewBtn = document.createElement('button');
+        reviewBtn.textContent = 'review';
+        reviewBtn.style.marginLeft = '8px';
+        reviewBtn.onclick = () => openReview('movie', title);
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'delete';
+        delBtn.style.marginLeft = '6px';
+        delBtn.onclick = () => li.remove();
+
+        li.appendChild(titleSpan);
+        li.appendChild(reviewBtn);
+        li.appendChild(delBtn);
+
         moviesList.appendChild(li);
       });
     }
 
-    // populate shows
+    // populate shows (handle objects)
     const shows = Array.isArray(data.shows) ? data.shows : [];
     const showsList = document.getElementById('showsList');
     if (showsList) {
       showsList.innerHTML = '';
       shows.forEach(s => {
+        const title = (s && typeof s === 'object') ? (s.title || s.name || 'Untitled') : s;
         const li = document.createElement('li');
-        li.innerHTML = s + ' <button onclick="this.parentElement.remove()">delete</button>';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = title;
+
+        const reviewBtn = document.createElement('button');
+        reviewBtn.textContent = 'review';
+        reviewBtn.style.marginLeft = '8px';
+        reviewBtn.onclick = () => openReview('show', title);
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'delete';
+        delBtn.style.marginLeft = '6px';
+        delBtn.onclick = () => li.remove();
+
+        li.appendChild(titleSpan);
+        li.appendChild(reviewBtn);
+        li.appendChild(delBtn);
+
         showsList.appendChild(li);
       });
     }
@@ -511,23 +547,60 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
       : "";
 
 
+    const poster = item.poster_path
+      ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+      : "https://via.placeholder.com/40x60?text=?";
+
+    const typeLabel = item.media_type === "movie" ? "Movie" : "Show";
+
     div.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+      <div style="
+        display:flex;
+        gap:10px;
+        align-items:center;
+      ">
 
-        <div>
-          <b>${title}</b><br>
-          <span style="font-size:12px; color:gray;">${date}</span>
+        <!-- Thumbnail -->
+        <img
+          src="${poster}"
+          style="
+            width:40px;
+            height:60px;
+            object-fit:cover;
+            border-radius:4px;
+          "
+        >
+
+        <!-- Text -->
+        <div style="flex:1;">
+          <div style="font-weight:bold;">
+            ${title}
+          </div>
+
+          <!-- Date + Type row -->
+          <div style="
+            font-size:12px;
+            color:gray;
+            display:flex;
+            gap:8px;
+            align-items:center;
+            margin-top:2px;
+          ">
+            <span>${date}</span>
+
+            <span style="opacity:0.6;">•</span>
+
+            <span style="
+              font-size:11px;
+              padding:2px 6px;
+              border-radius:4px;
+              background:${item.media_type === "movie" ? "#4a90e2" : "#e24a6b"};
+              color:white;
+            ">
+              ${typeLabel}
+            </span>
+          </div>
         </div>
-
-        <span style="
-          font-size:11px;
-          padding:3px 6px;
-          background:${item.media_type === "movie" ? "#4a90e2" : "#e24a6b"};
-          color:white;
-          border-radius:4px;
-        ">
-          ${item.media_type === "movie" ? "Movie" : "Show"}
-        </span>
 
       </div>
     `;
