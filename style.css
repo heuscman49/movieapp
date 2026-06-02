@@ -19,3 +19,13 @@ body {
 main, .content {
   margin-left: 260px; /* leave space for left pane */
 }
+
+.result-item {
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.result-item:hover {
+  background: #f2f2f2;
+}

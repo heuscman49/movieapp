@@ -55,8 +55,27 @@
   <div id="appSection" style="display:none;">
     <h1 id="welcomeHeader">Welcome <span id="usernameDisplay"></span> <button id="logoutBtn" style="margin-left:16px;">Logout</button></h1>
 
-    <input id="searchInput" placeholder="Search movies or shows">
-    <div id="searchResults"></div>
+    <input id="searchInput" placeholder="Search movies or shows" autocomplete="off">
+
+    <div id="searchDropdown" style="
+      position: relative;
+      width: 300px;
+    ">
+
+      <div id="resultsBox" style="
+        position: absolute;
+        top: 5px;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 999;
+        display: none;
+      "></div>
+
+    </div>
 
     <h2>Movies to watch:</h2>
     <ul id="moviesList"></ul>

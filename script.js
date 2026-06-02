@@ -442,30 +442,58 @@ window.addShow = addShow;
 const filterEl = document.getElementById("filterType");
 if (filterEl) filterEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };
 
-// Search input handler: call TMDB and render results
-const searchInput = document.getElementById('searchInput');
-if (searchInput) {
-  searchInput.addEventListener('input', async (e) => {
-    const query = e.target.value;
-    if (!query || query.length < 2) return;
+document.getElementById("searchInput").addEventListener("input", async (e) => {
+  const query = e.target.value.trim();
+  const box = document.getElementById("resultsBox");
 
-    const results = await searchMovies(query);
+  if (query.length < 2) {
+    box.style.display = "none";
+    return;
+  }
 
-    const box = document.getElementById('searchResults');
-    if (!box) return;
-    box.innerHTML = '';
+  const res = await fetch(
+    `https://api.themoviedb.org/3/search/multi?query=${query}&api_key=YOUR_API_KEY`
+  );
 
-    (results || []).slice(0, 5).forEach(item => {
-      const div = document.createElement('div');
+  const data = await res.json();
 
-      div.innerHTML = `\n      <b>${item.title || item.name}</b>\n      <button>Add</button>\n    `;
+  const results = (data.results || []).slice(0, 7);
 
-      div.onclick = () => { if (typeof addMedia === 'function') addMedia(item); };
+  box.innerHTML = "";
 
-      box.appendChild(div);
-    });
+  if (results.length === 0) {
+    box.style.display = "none";
+    return;
+  }
+
+  results.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "result-item";
+
+    const title = item.title || item.name;
+
+    div.textContent = title;
+
+    div.onclick = () => {
+      addMedia(item);
+      box.style.display = "none";
+      document.getElementById("searchInput").value = "";
+    };
+
+    box.appendChild(div);
   });
-}
+
+  box.style.display = "block";
+});
+
+document.addEventListener("click", (e) => {
+  const box = document.getElementById("resultsBox");
+  const input = document.getElementById("searchInput");
+
+  if (e.target !== input) {
+    if (box) box.style.display = "none";
+  }
+});
 
 // Make functions accessible to HTML buttons
 window.addMovie = addMovie;
