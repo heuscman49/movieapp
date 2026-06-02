@@ -34,6 +34,8 @@ onAuthStateChanged(auth, (user) => {
     checkAdmin(user);
   } else {
     currentUser = null;
+    if (authSection) authSection.style.display = 'block';
+    if (appSection) appSection.style.display = 'none';
   }
 });
 
