@@ -542,10 +542,6 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
 
     const title = item.title || item.name || "Unknown";
     const date = item.release_date || item.first_air_date || "No date";
-    const poster = item.poster_path
-      ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-      : "";
-
 
     const poster = item.poster_path
       ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
