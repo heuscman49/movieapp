@@ -1,0 +1,14 @@
+/* Blue left sidebar */
+#leftBox {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  background: #0078d4;
+}
+
+/* push page content to the right of the sidebar */
+body {
+  margin-left: 220px;
+}
