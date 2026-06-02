@@ -341,12 +341,12 @@ async function showUserData(uid) {
 
     <h4>🎬 Movies</h4>
     <ul>
-      ${(data.movies || []).map(m => `<li>${m}</li>`).join("")}
+      ${(data.movies || []).map(item => `<li>${(item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item}</li>`).join("")}
     </ul>
 
     <h4>📺 Shows</h4>
     <ul>
-      ${(data.shows || []).map(s => `<li>${s}</li>`).join("")}
+      ${(data.shows || []).map(item => `<li>${(item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item}</li>`).join("")}
     </ul>
   `;
 }
@@ -512,12 +512,23 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
 
 
     div.innerHTML = `
-      <div style="display:flex; gap:10px; align-items:center;">
-        <img src="${poster}" style="width:40px; height:60px; object-fit:cover; border-radius:4px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+
         <div>
-          <div><b>${title}</b></div>
-          <div style="font-size:12px; color:gray;">${date}</div>
+          <b>${title}</b><br>
+          <span style="font-size:12px; color:gray;">${date}</span>
         </div>
+
+        <span style="
+          font-size:11px;
+          padding:3px 6px;
+          background:${item.media_type === "movie" ? "#4a90e2" : "#e24a6b"};
+          color:white;
+          border-radius:4px;
+        ">
+          ${item.media_type === "movie" ? "Movie" : "Show"}
+        </span>
+
       </div>
     `;
 
