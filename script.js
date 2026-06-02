@@ -37,6 +37,38 @@ onAuthStateChanged(auth, (user) => {
     if (authSection) authSection.style.display = 'block';
     if (appSection) appSection.style.display = 'none';
   }
+
+async function loadWatched() {
+  const filter = document.getElementById("filterType").value;
+
+  const snap = await getDoc(doc(db, "users", currentUser.uid));
+  const data = snap.data();
+
+  let items = [];
+
+  if (filter === "all" || filter === "movies") {
+    items.push(...(data.movies || []).filter(m => m.watched));
+  }
+
+  if (filter === "all" || filter === "shows") {
+    items.push(...(data.shows || []).filter(s => s.watched));
+  }
+
+  const container = document.getElementById("watchedList");
+  container.innerHTML = "";
+
+  items.forEach(item => {
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <h4>${item.title}</h4>
+      <p>⭐ ${item.rating || "N/A"}</p>
+      <p>${item.review || ""}</p>
+    `;
+
+    container.appendChild(div);
+  });
+}
 });
 
 function checkAdmin(user) {
@@ -61,6 +93,42 @@ const setUsernameBtn = document.getElementById('setUsernameBtn');
 const usernameDisplay = document.getElementById('usernameDisplay');
 
 console.log('script initialized');
+
+let selectedItem = null;
+let selectedType = null;
+
+function openReview(type, title) {
+  selectedItem = title;
+  selectedType = type;
+
+  const box = document.getElementById("reviewBox");
+  if (box) box.style.display = "block";
+}
+
+document.getElementById("submitReviewBtn").onclick = async () => {
+  const rating = document.getElementById("ratingInput").value;
+  const review = document.getElementById("reviewText").value;
+
+  if (!currentUser || !selectedItem) return;
+
+  const ref = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(ref);
+  const data = snap.data();
+
+  const updatedMovies = (data.movies || []).map(m =>
+    m.title === selectedItem
+      ? { ...m, watched: true, rating, review }
+      : m
+  );
+
+  await updateDoc(ref, { movies: updatedMovies });
+
+  const box = document.getElementById("reviewBox");
+  if (box) box.style.display = "none";
+
+  if (typeof loadUserData === 'function') loadUserData();
+  if (typeof loadWatched === 'function') loadWatched();
+};
 
 // SIGN UP
 document.getElementById("signupBtn").onclick = () => {
@@ -304,7 +372,12 @@ async function addMovie() {
   const userRef = doc(db, "users", currentUser.uid);
 
   await updateDoc(userRef, {
-    movies: arrayUnion(movie)
+    movies: arrayUnion({
+      title: movie,
+      watched: false,
+      rating: null,
+      review: ""
+    })
   });
 
   // update UI
@@ -330,6 +403,13 @@ function addShow() {
   list.appendChild(li);
   input.value = "";
 }
+
+// Make functions accessible to HTML buttons
+window.addMovie = addMovie;
+window.addShow = addShow;
+
+const filterEl = document.getElementById("filterType");
+if (filterEl) filterEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };
 
 // Make functions accessible to HTML buttons
 window.addMovie = addMovie;

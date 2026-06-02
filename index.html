@@ -66,6 +66,25 @@
 
     <input id="showInput" placeholder="Add show">
     <button onclick="addShow()">Add</button>
+
+    <h2>Watched</h2>
+
+    <select id="filterType">
+      <option value="all">All</option>
+      <option value="movies">Movies</option>
+      <option value="shows">Shows</option>
+    </select>
+
+    <div id="watchedList"></div>
+
+    <div id="reviewBox" style="display:none; border:1px solid #ccc; padding:10px; margin-top:12px;">
+      <h3>Leave a review</h3>
+
+      <input id="ratingInput" type="number" min="1" max="5" placeholder="Stars (1-5)">
+      <input id="reviewText" placeholder="Optional review">
+
+      <button id="submitReviewBtn">Submit</button>
+    </div>
   </div>
 
   <div id="adminPanel" style="display:none; padding:20px;">
