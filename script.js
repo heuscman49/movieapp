@@ -38,6 +38,37 @@ onAuthStateChanged(auth, (user) => {
     if (appSection) appSection.style.display = 'none';
   }
 
+async function searchMovies(query) {
+  const res = await fetch(
+      `https://api.themoviedb.org/3/search/multi?query=${query}&api_key=608767c8f52970a29bb38126d419116e`
+  );
+
+  const data = await res.json();
+  return data.results;
+}
+
+async function addMedia(item) {
+  if (!currentUser) return;
+  try {
+    const userRef = doc(db, "users", currentUser.uid);
+
+    await updateDoc(userRef, {
+      movies: arrayUnion({
+        title: item.title || item.name,
+        poster: item.poster_path || null,
+        overview: item.overview || "",
+        rating: null,
+        watched: false,
+        review: ""
+      })
+    });
+
+    if (typeof loadUserData === 'function') await loadUserData();
+  } catch (err) {
+    console.error("Failed to add media", err);
+  }
+}
+
 async function loadWatched() {
   const filter = document.getElementById("filterType").value;
 
@@ -410,6 +441,31 @@ window.addShow = addShow;
 
 const filterEl = document.getElementById("filterType");
 if (filterEl) filterEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };
+
+// Search input handler: call TMDB and render results
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('input', async (e) => {
+    const query = e.target.value;
+    if (!query || query.length < 2) return;
+
+    const results = await searchMovies(query);
+
+    const box = document.getElementById('searchResults');
+    if (!box) return;
+    box.innerHTML = '';
+
+    (results || []).slice(0, 5).forEach(item => {
+      const div = document.createElement('div');
+
+      div.innerHTML = `\n      <b>${item.title || item.name}</b>\n      <button>Add</button>\n    `;
+
+      div.onclick = () => { if (typeof addMedia === 'function') addMedia(item); };
+
+      box.appendChild(div);
+    });
+  });
+}
 
 // Make functions accessible to HTML buttons
 window.addMovie = addMovie;
