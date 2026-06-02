@@ -29,3 +29,15 @@ main, .content {
 .result-item:hover {
   background: #f2f2f2;
 }
+
+#previewCard {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+#previewCard img {
+  border-radius: 10px;
+}

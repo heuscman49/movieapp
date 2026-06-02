@@ -150,6 +150,49 @@ const usernameSection = document.getElementById('usernameSection');
 const usernameInput = document.getElementById('usernameInput');
 const setUsernameBtn = document.getElementById('setUsernameBtn');
 const usernameDisplay = document.getElementById('usernameDisplay');
+const preview = document.getElementById('previewCard');
+
+function showPreview(item, x, y) {
+  const preview = document.getElementById("previewCard");
+
+  const title = item.title || item.name;
+  const date = item.release_date || item.first_air_date || "No date";
+  const poster = item.poster_path
+    ? `https://image.tmdb.org/t/p/w185${item.poster_path}`
+    : "";
+  const overview = item.overview || "No description available.";
+
+  if (!preview) return;
+
+  preview.innerHTML = `
+    <img src="${poster}" style="width:100%; border-radius:10px; margin-bottom:8px;">
+    <h3 style="margin:0;">${title}</h3>
+    <div style="font-size:12px; opacity:0.7;">${date}</div>
+    <p style="font-size:12px; margin-top:8px;">
+      ${overview.slice(0, 120)}...
+    </p>
+  `;
+
+  preview.style.display = "block";
+  preview.style.opacity = "1";
+  preview.style.transform = "translateY(0px)";
+
+  preview.style.left = x + 15 + "px";
+  preview.style.top = y + 15 + "px";
+}
+
+function hidePreview() {
+  const preview = document.getElementById("previewCard");
+
+  if (!preview) return;
+
+  preview.style.opacity = "0";
+  preview.style.transform = "translateY(10px)";
+
+  setTimeout(() => {
+    if (preview) preview.style.display = "none";
+  }, 200);
+}
 
 console.log('script initialized');
 
@@ -285,6 +328,30 @@ async function loadUserData() {
         li.appendChild(reviewBtn);
         li.appendChild(delBtn);
 
+        // preview on hover for stored items
+        li.addEventListener("mouseenter", (e) => {
+          // map stored object to expected preview shape
+          const previewItem = {
+            title: m.title || m.name,
+            name: m.name || m.title,
+            poster_path: m.poster || m.poster_path,
+            release_date: m.date || m.release_date,
+            first_air_date: m.date || m.first_air_date,
+            overview: m.overview || m.overview
+          };
+          showPreview(previewItem, e.clientX, e.clientY);
+        });
+
+        li.addEventListener("mousemove", (e) => {
+          const preview = document.getElementById("previewCard");
+          if (preview) {
+            preview.style.left = e.clientX + 15 + "px";
+            preview.style.top = e.clientY + 15 + "px";
+          }
+        });
+
+        li.addEventListener("mouseleave", hidePreview);
+
         moviesList.appendChild(li);
       });
     }
@@ -314,6 +381,18 @@ async function loadUserData() {
         li.appendChild(titleSpan);
         li.appendChild(reviewBtn);
         li.appendChild(delBtn);
+
+        li.addEventListener("mouseenter", (e) => {
+          showPreview(s, e.clientX, e.clientY);
+        });
+
+        li.addEventListener("mousemove", (e) => {
+          const preview = document.getElementById("previewCard");
+          preview.style.left = e.clientX + 15 + "px";
+          preview.style.top = e.clientY + 15 + "px";
+        });
+
+        li.addEventListener("mouseleave", hidePreview);
 
         showsList.appendChild(li);
       });
@@ -606,6 +685,18 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
       addMedia(item);
     };
 
+    div.addEventListener("mouseenter", (e) => {
+      showPreview(item, e.clientX, e.clientY);
+    });
+
+    div.addEventListener("mousemove", (e) => {
+      const preview = document.getElementById("previewCard");
+      preview.style.left = e.clientX + 15 + "px";
+      preview.style.top = e.clientY + 15 + "px";
+    });
+
+    div.addEventListener("mouseleave", hidePreview);
+
     box.appendChild(div);
   });
 
@@ -620,6 +711,14 @@ document.addEventListener("click", (e) => {
 
   if (e.target !== input && !box.contains(e.target)) {
     box.style.display = "none";
+    // hide preview with animation
+    if (typeof preview !== 'undefined' && preview) {
+      preview.style.opacity = "0";
+      preview.style.transform = "translateY(10px)";
+      setTimeout(() => {
+        if (preview) preview.style.display = "none";
+      }, 200); // match CSS transition time
+    }
   }
 });
 
