@@ -48,6 +48,8 @@ async function searchMovies(query) {
 }
 
 async function addMedia(item) {
+  console.log("ADDING MEDIA:", item);
+  console.log("CURRENT USER:", currentUser);
   if (!currentUser) return;
   const userRef = doc(db, "users", currentUser.uid);
 
@@ -65,13 +67,23 @@ async function addMedia(item) {
   };
 
   if (isMovie) {
-    await updateDoc(userRef, {
-      movies: arrayUnion(mediaObject)
-    });
+    try {
+      await updateDoc(userRef, {
+        movies: arrayUnion(mediaObject)
+      });
+      console.log("Saved to Firestore");
+    } catch (err) {
+      console.error("Firestore error:", err);
+    }
   } else {
-    await updateDoc(userRef, {
-      shows: arrayUnion(mediaObject)
-    });
+    try {
+      await updateDoc(userRef, {
+        shows: arrayUnion(mediaObject)
+      });
+      console.log("Saved to Firestore");
+    } catch (err) {
+      console.error("Firestore error:", err);
+    }
   }
 
   // UI cleanup
@@ -493,6 +505,7 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
       ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
       : "";
 
+
     div.innerHTML = `
       <div style="display:flex; gap:10px; align-items:center;">
         <img src="${poster}" style="width:40px; height:60px; object-fit:cover; border-radius:4px;">
@@ -503,7 +516,10 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
       </div>
     `;
 
-    div.onclick = () => addMedia(item);
+    div.onclick = (e) => {
+      e.stopPropagation(); // 🔥 prevents dropdown closing first
+      addMedia(item);
+    };
 
     box.appendChild(div);
   });
@@ -515,8 +531,10 @@ document.addEventListener("click", (e) => {
   const box = document.getElementById("resultsBox");
   const input = document.getElementById("searchInput");
 
-  if (e.target !== input) {
-    if (box) box.style.display = "none";
+  if (!box || !input) return;
+
+  if (e.target !== input && !box.contains(e.target)) {
+    box.style.display = "none";
   }
 });
 
