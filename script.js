@@ -49,24 +49,38 @@ async function searchMovies(query) {
 
 async function addMedia(item) {
   if (!currentUser) return;
-  try {
-    const userRef = doc(db, "users", currentUser.uid);
+  const userRef = doc(db, "users", currentUser.uid);
 
+  const isMovie = item.media_type === "movie";
+
+  const mediaObject = {
+    title: item.title || item.name,
+    poster: item.poster_path,
+    overview: item.overview || "",
+    date: item.release_date || item.first_air_date || "",
+    rating: null,
+    watched: false,
+    review: "",
+    type: isMovie ? "movie" : "show"
+  };
+
+  if (isMovie) {
     await updateDoc(userRef, {
-      movies: arrayUnion({
-        title: item.title || item.name,
-        poster: item.poster_path || null,
-        overview: item.overview || "",
-        rating: null,
-        watched: false,
-        review: ""
-      })
+      movies: arrayUnion(mediaObject)
     });
-
-    if (typeof loadUserData === 'function') await loadUserData();
-  } catch (err) {
-    console.error("Failed to add media", err);
+  } else {
+    await updateDoc(userRef, {
+      shows: arrayUnion(mediaObject)
+    });
   }
+
+  // UI cleanup
+  const si = document.getElementById("searchInput");
+  const rb = document.getElementById("resultsBox");
+  if (si) si.value = "";
+  if (rb) rb.style.display = "none";
+
+  if (typeof loadUserData === 'function') loadUserData();
 }
 
 async function loadWatched() {
@@ -451,13 +465,16 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
     return;
   }
 
-  const res = await fetch(
-      `https://api.themoviedb.org/3/search/multi?query=${query}&api_key=608767c8f52970a29bb38126d419116e`
-  );
+  const movieRes = await fetch(`https://api.themoviedb.org/3/search/movie?query=${query}&api_key=608767c8f52970a29bb38126d419116e`);
+  const tvRes = await fetch(`https://api.themoviedb.org/3/search/tv?query=${query}&api_key=608767c8f52970a29bb38126d419116e`);
 
-  const data = await res.json();
+  const movieData = await movieRes.json();
+  const tvData = await tvRes.json();
 
-  const results = (data.results || []).slice(0, 7);
+  const results = [
+    ... (movieData.results || []).map(r => ({ ...r, media_type: "movie" })),
+    ... (tvData.results || []).map(r => ({ ...r, media_type: "tv" }))
+  ].slice(0, 7);
 
   box.innerHTML = "";
 
@@ -470,15 +487,23 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
     const div = document.createElement("div");
     div.className = "result-item";
 
-    const title = item.title || item.name;
+    const title = item.title || item.name || "Unknown";
+    const date = item.release_date || item.first_air_date || "No date";
+    const poster = item.poster_path
+      ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+      : "";
 
-    div.textContent = title;
+    div.innerHTML = `
+      <div style="display:flex; gap:10px; align-items:center;">
+        <img src="${poster}" style="width:40px; height:60px; object-fit:cover; border-radius:4px;">
+        <div>
+          <div><b>${title}</b></div>
+          <div style="font-size:12px; color:gray;">${date}</div>
+        </div>
+      </div>
+    `;
 
-    div.onclick = () => {
-      addMedia(item);
-      box.style.display = "none";
-      document.getElementById("searchInput").value = "";
-    };
+    div.onclick = () => addMedia(item);
 
     box.appendChild(div);
   });
