@@ -466,6 +466,9 @@ function addShow() {
 // Make functions accessible to HTML buttons
 window.addMovie = addMovie;
 window.addShow = addShow;
+// Expose addMedia and openReview globally for onclick handlers
+window.addMedia = addMedia;
+window.openReview = openReview;
 
 const filterEl = document.getElementById("filterType");
 if (filterEl) filterEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };
