@@ -1,11 +1,13 @@
-/* Blue left sidebar */
-#leftBox {
+/* Blue left sidebar implemented via pseudo-element so it appears on every page */
+body::before {
+  content: "";
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   width: 200px;
   background: #0078d4;
+  z-index: 9999;
 }
 
 /* push page content to the right of the sidebar */
