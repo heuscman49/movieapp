@@ -1307,6 +1307,46 @@ async function loadRecentActivity() {
 const filterEl = document.getElementById("filterType");
 if (filterEl) filterEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };
 
+// Search filter functionality
+let searchFilter = 'all';
+const searchFilterBtn = document.getElementById('searchFilterBtn');
+const searchFilterMenu = document.getElementById('searchFilterMenu');
+const searchFilterLabel = document.getElementById('searchFilterLabel');
+
+if (searchFilterBtn) {
+  searchFilterBtn.onclick = (e) => {
+    e.stopPropagation();
+    searchFilterMenu.style.display = searchFilterMenu.style.display === 'block' ? 'none' : 'block';
+  };
+}
+
+// Handle filter option clicks
+document.querySelectorAll('.filter-option').forEach(option => {
+  option.onclick = (e) => {
+    e.stopPropagation();
+    searchFilter = option.getAttribute('data-filter');
+    searchFilterLabel.textContent = option.textContent;
+    searchFilterMenu.style.display = 'none';
+    
+    // Update active state
+    document.querySelectorAll('.filter-option').forEach(opt => opt.classList.remove('active'));
+    option.classList.add('active');
+    
+    // Trigger search if there's a query
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && searchInput.value.trim().length >= 2) {
+      searchInput.dispatchEvent(new Event('input'));
+    }
+  };
+});
+
+// Close filter menu when clicking outside
+document.addEventListener('click', (e) => {
+  if (searchFilterMenu && !searchFilterMenu.contains(e.target) && e.target !== searchFilterBtn) {
+    searchFilterMenu.style.display = 'none';
+  }
+});
+
 document.getElementById("searchInput").addEventListener("input", async (e) => {
   const query = e.target.value.trim();
   const box = document.getElementById("resultsBox");
@@ -1316,16 +1356,21 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
     return;
   }
 
-  const movieRes = await fetch(`https://api.themoviedb.org/3/search/movie?query=${query}&api_key=608767c8f52970a29bb38126d419116e`);
-  const tvRes = await fetch(`https://api.themoviedb.org/3/search/tv?query=${query}&api_key=608767c8f52970a29bb38126d419116e`);
+  let results = [];
+  
+  if (searchFilter === 'all' || searchFilter === 'movie') {
+    const movieRes = await fetch(`https://api.themoviedb.org/3/search/movie?query=${query}&api_key=608767c8f52970a29bb38126d419116e`);
+    const movieData = await movieRes.json();
+    results = [...results, ...(movieData.results || []).map(r => ({ ...r, media_type: "movie" }))];
+  }
+  
+  if (searchFilter === 'all' || searchFilter === 'tv') {
+    const tvRes = await fetch(`https://api.themoviedb.org/3/search/tv?query=${query}&api_key=608767c8f52970a29bb38126d419116e`);
+    const tvData = await tvRes.json();
+    results = [...results, ...(tvData.results || []).map(r => ({ ...r, media_type: "tv" }))];
+  }
 
-  const movieData = await movieRes.json();
-  const tvData = await tvRes.json();
-
-  const results = [
-    ... (movieData.results || []).map(r => ({ ...r, media_type: "movie" })),
-    ... (tvData.results || []).map(r => ({ ...r, media_type: "tv" }))
-  ].slice(0, 7);
+  results = results.slice(0, 7);
 
   box.innerHTML = "";
 

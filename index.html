@@ -83,10 +83,65 @@
 
     <div id="searchDropdown" style="
       position: relative;
-      width: 300px;
+      width: 350px;
       margin: 0 auto;
+      display: flex;
+      gap: 4px;
     ">
-      <input id="searchInput" placeholder="Search movies or shows" autocomplete="off" style="width: 100%; box-sizing: border-box;">
+      <div style="position: relative;">
+        <button id="searchFilterBtn" style="
+          padding: 8px 12px;
+          border-radius: 10px 0 0 10px;
+          border: 1px solid var(--border);
+          background: var(--panel-bg);
+          color: var(--text);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 14px;
+        ">
+          <span id="searchFilterLabel">All</span>
+          <span style="font-size: 10px;">▼</span>
+        </button>
+        <div id="searchFilterMenu" style="
+          position: absolute;
+          top: 100%;
+          left: 0;
+          min-width: 100px;
+          background: var(--panel-bg);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          z-index: 1000;
+          display: none;
+          margin-top: 4px;
+          overflow: hidden;
+        ">
+          <div class="filter-option" data-filter="all" style="
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+          ">All</div>
+          <div class="filter-option" data-filter="movie" style="
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+          ">Movies</div>
+          <div class="filter-option" data-filter="tv" style="
+            padding: 8px 12px;
+            cursor: pointer;
+          ">Shows</div>
+        </div>
+      </div>
+      <input id="searchInput" placeholder="Search movies or shows" autocomplete="off" style="
+        flex: 1;
+        border-radius: 0 10px 10px 0;
+        padding: 8px;
+        border: 1px solid var(--border);
+        background: var(--panel-bg);
+        color: var(--text);
+        box-sizing: border-box;
+      ">
 
       <div id="resultsBox" style="
         position: absolute;
