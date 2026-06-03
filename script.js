@@ -19,6 +19,22 @@ const firebaseConfig = {
   appId: "1:582845569937:web:19a3ece22db445db6a5830"
 };
 
+// select a star for rating UI
+window.selectStar = (index, value) => {
+  const starsEl = document.getElementById(`stars-${index}`);
+  if (!starsEl) return;
+
+  // update hidden input
+  const input = document.getElementById(`rating-input-${index}`);
+  if (input) input.value = value;
+
+  // update visuals
+  Array.from(starsEl.querySelectorAll('.star')).forEach(span => {
+    const v = Number(span.getAttribute('data-value'));
+    if (v <= value) span.classList.add('selected'); else span.classList.remove('selected');
+  });
+};
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -176,11 +192,21 @@ async function loadWatched() {
   watched.forEach((w, i) => {
     const li = document.createElement("li");
 
+    // render star rating UI (click to select) + hidden input for value
+    const currentRating = w.rating || 0;
+    let starsHtml = '';
+    for (let s = 1; s <= 5; s++) {
+      const filled = s <= currentRating ? 'selected' : '';
+      starsHtml += `<span class="star ${filled}" data-value="${s}" onclick="selectStar(${i}, ${s})">★</span>`;
+    }
+
     li.innerHTML = `
       ⭐ ${w.title}
 
-      <input type="number" min="1" max="5" placeholder="Rating" value="${w.rating || ''}" onchange="setRating(${i}, this.value)">
-      <input type="text" placeholder="Review" value="${(w.review||'').replace(/"/g, '&quot;')}" onchange="setReview(${i}, this.value)">
+      <div class="stars" id="stars-${i}">${starsHtml}</div>
+      <input id="rating-input-${i}" type="hidden" value="${w.rating || ''}">
+      <input id="review-input-${i}" type="text" placeholder="Review" value="${(w.review||'').replace(/"/g, '&quot;')}" onchange="setReview(${i}, this.value)">
+      <button onclick="submitRating(${i})">Submit</button>
     `;
 
     container.appendChild(li);
@@ -210,6 +236,49 @@ window.setReview = async (index, value) => {
 
   await updateDoc(userRef, { watched });
 };
+
+// submit the rating/review for a watched item and refresh the ratings panel
+window.submitRating = async (index) => {
+  if (!currentUser) return alert('Not signed in');
+
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
+  const data = snap.data() || {};
+  const watched = Array.isArray(data.watched) ? data.watched.slice() : [];
+
+  if (index < 0 || index >= watched.length) return console.error('Index OOB');
+
+  // values should already be set via setRating/setReview handlers, but ensure we read inputs
+  const ratingEl = document.getElementById(`rating-input-${index}`);
+  const reviewEl = document.getElementById(`review-input-${index}`);
+  if (ratingEl) watched[index].rating = Number(ratingEl.value) || 0;
+  if (reviewEl) watched[index].review = reviewEl.value || '';
+
+  await updateDoc(userRef, { watched });
+
+  // refresh watched UI and ratings panel
+  if (typeof loadWatched === 'function') loadWatched();
+  if (typeof loadRatings === 'function') loadRatings();
+};
+
+// populate the top-right ratings panel with reviewed items
+async function loadRatings() {
+  if (!currentUser) return;
+  const snap = await getDoc(doc(db, "users", currentUser.uid));
+  const data = snap.data() || {};
+
+  const list = document.getElementById('ratingsList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  const watched = Array.isArray(data.watched) ? data.watched : [];
+
+  watched.filter(w => w.rating).forEach((w, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${w.title}</strong><br>⭐ ${w.rating} — ${w.review || ''}`;
+    list.appendChild(li);
+  });
+}
 
 
 function checkAdmin(user) {
@@ -411,6 +480,10 @@ async function showApp(user) {
 
   // load persisted user data (movies/shows)
   await loadUserData();
+  // load watched items into the watched section
+  if (typeof loadWatched === 'function') loadWatched();
+  // load ratings panel
+  if (typeof loadRatings === 'function') loadRatings();
 
   // show admin panel for a specific admin email
   try {

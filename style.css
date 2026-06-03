@@ -59,3 +59,25 @@ main, .content {
   border-radius: 8px;
   object-fit: cover;
 }
+
+/* Ratings panel on top-right */
+#ratingsPanel {
+  font-family: system-ui, Arial, sans-serif;
+}
+
+#ratingsList li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+#ratingsList li:last-child { border-bottom: none; }
+
+/* star rating visuals */
+.star {
+  cursor: pointer;
+  color: #ddd;
+  font-size: 18px;
+  margin-right: 2px;
+}
+.star.selected { color: #f5b301; }
+.stars { display: inline-block; margin-right: 8px; }
