@@ -778,12 +778,12 @@ html.theme-meiko #previewCard {
   
   /* Oversized background images on mobile for scroll reveal */
   html.theme-hatsune::before {
-    background-size: 150% auto;
+    background-size: contain;
     background-position: center center;
     position: absolute;
   }
   html.theme-meiko::before {
-    background-size: 150% auto;
+    background-size: contain;
     background-position: center center;
     position: absolute;
   }
