@@ -59,7 +59,7 @@
     <h1 id="welcomeHeader">Welcome <span id="usernameDisplay"></span>
       <button id="moreBtn" aria-haspopup="true" aria-expanded="false" style="margin-left:12px; border:none; background:transparent; font-size:20px; cursor:pointer;"><span class="dotsIcon">⋯</span></button>
 
-      <div id="moreMenu" style="display:none; position:absolute; margin-top:4px; right:20px; background:var(--panel-bg); border:1px solid var(--border); z-index:1500;">
+      <div id="moreMenu" style="display:none; position:absolute; margin-top:4px; background:var(--panel-bg); border:1px solid var(--border); z-index:1500;">
         <div id="menuChangeUsername">Change username</div>
         <div id="menuLogout">Logout</div>
       </div>
@@ -67,17 +67,21 @@
 
 
 
-    <!-- floating side icons panel -->
-    <div id="sideIcons" class="side-icons">
-      <div class="side-item" data-action="reviews">
-        <button id="openReviewsBtn" class="side-btn" title="My Reviews">📝</button>
-        <span class="side-label">My Reviews</span>
+    <!-- left nav panel (theme-aware) -->
+    <aside id="navPanel" class="nav-panel" aria-label="App navigation">
+      <div id="sideIcons" class="side-icons">
+        <div class="side-item" data-action="reviews">
+          <button id="openReviewsBtn" class="side-btn" title="My Reviews" type="button">📝</button>
+          <span class="side-label">My Reviews</span>
+        </div>
+        <div class="side-item" data-action="settings">
+          <button id="openSettingsBtn" class="side-btn" title="Settings" type="button">⚙️</button>
+          <span class="side-label">Settings</span>
+        </div>
       </div>
-      <div class="side-item" data-action="settings">
-        <button id="openSettingsBtn" class="side-btn" title="Settings">⚙️</button>
-        <span class="side-label">Settings</span>
-      </div>
-    </div>
+    </aside>
+
+    <div id="overlayBackdrop" aria-hidden="true"></div>
 
     <input id="searchInput" placeholder="Search movies or shows" autocomplete="off">
 
@@ -91,8 +95,6 @@
         top: 5px;
         left: 0;
         right: 0;
-        background: white;
-        border: 1px solid #ddd;
         max-height: 200px;
         overflow-y: auto;
         z-index: 999;
@@ -102,7 +104,7 @@
     </div>
 
     <!-- Reviews page (hidden by default) -->
-    <div id="reviewsPage" style="display:none; padding:12px;">
+    <div id="reviewsPage" class="overlay-page">
       <h2>All Reviews</h2>
       <label>Sort: <select id="reviewsSort">
         <option value="newest">Newest</option>
@@ -113,7 +115,7 @@
     </div>
 
     <!-- Settings page (empty for now) -->
-    <div id="settingsPage" style="display:none; padding:12px;">
+    <div id="settingsPage" class="overlay-page">
       <h2>Settings</h2>
       <h3>Themes</h3>
       <div id="themesGrid" style="display:flex; flex-direction:column; gap:8px;">
@@ -130,13 +132,13 @@
       </div>
     </div>
 
-    <div class="lists-row" style="display:flex; gap:24px; align-items:flex-start;">
-      <div style="flex:1;">
+    <div class="lists-row">
+      <div class="watch-list">
         <h2>Movies to watch:</h2>
         <ul id="moviesList"></ul>
       </div>
 
-      <div style="width:360px;">
+      <div class="watch-list">
         <h2>Shows to watch:</h2>
         <ul id="showsList"></ul>
       </div>

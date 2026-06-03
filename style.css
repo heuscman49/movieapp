@@ -1,5 +1,6 @@
 /* Global layout */
-body { margin: 0; font-family: system-ui, Arial, sans-serif; background:var(--bg); color:var(--text); }
+html { background: var(--bg); min-height: 100%; }
+body { margin: 0; font-family: system-ui, Arial, sans-serif; background:var(--bg); color:var(--text); min-height: 100%; }
 
 /* CSS variables for theming */
 :root {
@@ -37,8 +38,8 @@ body.theme-midnight { --bg:#080608; --text:#ffe9db; --muted:#b88a78; --panel-bg:
 /* Shallows theme (was previously called Ocean) - light with blue accents */
 body.theme-shallows { --bg:#e9f7fb; --text:#06324a; --muted:#6b9fb5; --panel-bg:#dff3f9; --border:#bfeaf6; --accent:#00a8d4; --accent-text:#eef9ff; --preview-bg: rgba(2,40,60,0.95); }
 
-/* Ocean theme: light blue and darker blue contrasts */
-body.theme-ocean { --bg:#e9f7fb; --text:#06324a; --muted:#6b9fb5; --panel-bg:#dff3f9; --border:#bfeaf6; --accent:#00a8d4; --accent-text:#eef9ff; --preview-bg: rgba(2,40,60,0.95); }
+/* Ocean theme: dark blue base with light blue accents */
+body.theme-ocean { --bg:#041828; --text:#c8ecff; --muted:#6a9fc4; --panel-bg:#062238; --border:#0f3d5c; --accent:#5dd4ff; --accent-text:#041828; --preview-bg: rgba(4,24,40,0.95); }
 
 /* Forest theme: greens ranging from light to dark (avoid neon hacker green) */
 body.theme-forest { --bg:#f3faf3; --text:#12321a; --muted:#6a8a66; --panel-bg:#eef7ec; --border:#d6ead3; --accent:#2e7d3b; --accent-text:#fff; --preview-bg: rgba(6,30,12,0.95); }
@@ -46,29 +47,85 @@ body.theme-forest { --bg:#f3faf3; --text:#12321a; --muted:#6a8a66; --panel-bg:#e
 /* Left login pane */
 #leftPane { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; padding: 20px; background: var(--panel-bg); box-shadow: 2px 0 6px rgba(0,0,0,0.05); color:var(--text); border-right:1px solid var(--border); }
 
-/* Make room for the side icons on the left */
-#appSection { margin-left: 100px; }
+/* Main content offset for left nav panel */
+#appSection { margin-left: 84px; }
 
-/* side icons panel */
-.side-icons { position: fixed; left: 12px; top: 120px; z-index: 1100; display:flex; flex-direction:column; gap:12px; }
-.side-item { position: relative; display:flex; align-items:center; }
-.side-btn { width:44px; height:44px; border-radius:8px; background:var(--panel-bg); border:1px solid var(--border); cursor:pointer; color:var(--text); }
-.side-label { position:absolute; left:54px; white-space:nowrap; background:var(--panel-bg); border:1px solid var(--border); padding:6px 10px; border-radius:8px; margin-left:8px; transform: translateX(-8px); opacity:0; transition: transform 220ms ease, opacity 220ms ease; pointer-events:none; color:var(--text); }
+/* Left nav panel (theme-aware) */
+.nav-panel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 72px;
+  padding: 16px 10px;
+  box-sizing: border-box;
+  background: var(--panel-bg);
+  border-right: 1px solid var(--border);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.side-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+.side-item { position: relative; display:flex; align-items:center; justify-content:center; width:100%; }
+.side-btn { width:44px; height:44px; border-radius:8px; background:var(--bg); border:1px solid var(--border); cursor:pointer; color:var(--text); }
+.side-label { position:absolute; left:54px; white-space:nowrap; background:var(--panel-bg); border:1px solid var(--border); padding:6px 10px; border-radius:8px; margin-left:8px; transform: translateX(-8px); opacity:0; transition: transform 220ms ease, opacity 220ms ease; pointer-events:none; color:var(--text); z-index: 10; }
 .side-item.expanded .side-label { transform: translateX(0); opacity:1; }
 
 /* visual feedback when clicking/active */
 .side-btn:active, .side-btn.active { background: color-mix(in srgb, var(--panel-bg) 70%, var(--accent) 30%); transform: translateY(1px); }
 .theme-tile:active { background: color-mix(in srgb, var(--panel-bg) 70%, var(--accent) 30%); }
 
-/* make the label area slide out (container width increases smoothly) */
-.side-icons { transition: width 220ms ease; }
+/* Themed backdrop behind reviews/settings */
+#overlayBackdrop {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 55%, #000 45%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+  z-index: 1150;
+}
+#overlayBackdrop.visible {
+  opacity: 1;
+  visibility: visible;
+}
 
 /* Reviews/settings overlays */
-#reviewsPage, #settingsPage { position:fixed; left:80px; top:80px; right:80px; bottom:80px; background:var(--panel-bg); border:1px solid var(--border); padding:16px; overflow:auto; border-radius:8px; z-index:1200; color:var(--text); }
+.overlay-page {
+  position: fixed;
+  left: 88px;
+  top: 40px;
+  right: 40px;
+  bottom: 40px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  padding: 16px;
+  overflow: auto;
+  border-radius: 8px;
+  z-index: 1200;
+  color: var(--text);
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+.overlay-page.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 /* all reviews layout: responsive grid */
 #allReviewsList { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px; list-style:none; padding:0; margin:0; }
-#allReviewsList li { padding:12px; border:1px solid #f0f0f0; border-radius:8px; background:#fff; }
+#allReviewsList li { padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); }
 
 /* Result item */
 .result-item { padding:8px; cursor:pointer; border-bottom:1px solid var(--border); }
@@ -76,7 +133,7 @@ body.theme-forest { --bg:#f3faf3; --text:#12321a; --muted:#6a8a66; --panel-bg:#e
 
 /* rounded search input and dropdown */
 #searchInput { border-radius: 10px; padding:8px; border:1px solid var(--border); background:var(--panel-bg); color:var(--text); }
-#resultsBox { border-radius:8px; overflow:hidden; }
+#resultsBox { border-radius:8px; overflow:hidden; background:var(--panel-bg); border:1px solid var(--border); color:var(--text); }
 
 /* dropdown menu fade */
 .fade-in { animation: fadeIn 180ms ease forwards; transform-origin: top center; transform: scale(0.99); }
@@ -84,10 +141,13 @@ body.theme-forest { --bg:#f3faf3; --text:#12321a; --muted:#6a8a66; --panel-bg:#e
 
 /* moreMenu styles (compact 3-dot dropdown) */
 #moreMenu {
+  width: max-content;
+  min-width: unset;
   border-radius: 5px;
   overflow: hidden;
   padding: 2px;
   font-size: 11px;
+  font-weight: normal;
   line-height: 1.2;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
@@ -98,10 +158,21 @@ body.theme-forest { --bg:#f3faf3; --text:#12321a; --muted:#6a8a66; --panel-bg:#e
 }
 #moreMenu div:hover { background: color-mix(in srgb, var(--panel-bg) 70%, var(--accent) 30%); }
 
-/* overlay dimming utility for modal/overlays */
-.overlay-dim { background-color: rgba(0,0,0,0.08); }
-body.overlay-dim::before { content:''; position:fixed; left:0; top:0; right:0; bottom:0; background: rgba(0,0,0,0.08); pointer-events:none; z-index:900; }
-body.overlay-dim { filter: brightness(0.98); }
+/* Movies / shows watch lists side by side */
+.lists-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.watch-list {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.watch-list h2 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
 
 /* Preview card */
 #previewCard { position: fixed; width: min(260px, 30vw); max-width: 320px; max-height: 60vh; overflow-y: auto; border-radius: 14px; background: var(--preview-bg); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity:0; transform: translateY(10px); transition: opacity 0.2s ease, transform 0.2s ease; color:var(--text); }
@@ -109,7 +180,7 @@ body.overlay-dim { filter: brightness(0.98); }
 
 /* Recent activity panel (top right) */
 #ratingsPanel { position:fixed; top:20px; right:20px; width:320px; max-height:60vh; overflow:auto; padding:12px; border-radius:8px; z-index:1000; font-family: system-ui, Arial, sans-serif; background:var(--panel-bg); border:1px solid var(--border); color:var(--text); }
-#ratingsList li { padding:8px 0; border-bottom:1px solid #f0f0f0; }
+#ratingsList li { padding:8px 0; border-bottom:1px solid var(--border); }
 #ratingsList li:last-child { border-bottom: none; }
 
 /* star rating visuals */

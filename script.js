@@ -919,24 +919,44 @@ const moreMenu = document.getElementById('moreMenu');
 const menuLogout = document.getElementById('menuLogout');
 const menuChangeUsername = document.getElementById('menuChangeUsername');
 
+function closeMoreMenu() {
+  if (!moreMenu) return;
+  moreMenu.style.display = 'none';
+  moreMenu.classList.remove('fade-in');
+  if (moreBtn) {
+    moreBtn.classList.remove('open');
+    moreBtn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+function openMoreMenu() {
+  if (!moreBtn || !moreMenu) return;
+  moreMenu.style.display = 'block';
+  moreMenu.classList.add('fade-in');
+  moreBtn.classList.add('open');
+  moreBtn.setAttribute('aria-expanded', 'true');
+  const rect = moreBtn.getBoundingClientRect();
+  moreMenu.style.position = 'fixed';
+  moreMenu.style.width = 'max-content';
+  moreMenu.style.minWidth = '';
+  moreMenu.style.right = 'auto';
+  moreMenu.style.left = rect.left + 'px';
+  moreMenu.style.top = (rect.bottom + 4) + 'px';
+}
+
 if (moreBtn && moreMenu) {
-  moreBtn.onclick = () => {
+  moreBtn.onclick = (e) => {
+    e.stopPropagation();
     const shown = moreMenu.style.display === 'block';
-    moreMenu.style.display = shown ? 'none' : 'block';
-    if (!shown) {
-      moreMenu.classList.add('fade-in');
-      moreBtn.classList.add('open');
-      // position under the button
-      const rect = moreBtn.getBoundingClientRect();
-      moreMenu.style.position = 'fixed';
-      moreMenu.style.minWidth = '88px';
-      moreMenu.style.left = (rect.left) + 'px';
-      moreMenu.style.top = (rect.bottom + 4) + 'px';
-    } else {
-      moreMenu.classList.remove('fade-in');
-      moreBtn.classList.remove('open');
-    }
+    if (shown) closeMoreMenu();
+    else openMoreMenu();
   };
+
+  document.addEventListener('click', (e) => {
+    if (moreMenu.style.display !== 'block') return;
+    if (moreBtn.contains(e.target) || moreMenu.contains(e.target)) return;
+    closeMoreMenu();
+  });
 }
 
 if (menuLogout) {
@@ -986,32 +1006,83 @@ if (setUsernameBtn) {
 window.addMedia = addMedia;
 window.openReview = openReview;
 
+// Reviews/Settings overlay helpers
+const overlayBackdrop = () => document.getElementById('overlayBackdrop');
+
+function syncOverlayBackdrop() {
+  const backdrop = overlayBackdrop();
+  if (!backdrop) return;
+  const anyOpen = document.querySelector('.overlay-page.is-open');
+  backdrop.classList.toggle('visible', !!anyOpen);
+  backdrop.setAttribute('aria-hidden', anyOpen ? 'false' : 'true');
+}
+
+function openOverlayPage(page) {
+  if (!page) return;
+  document.querySelectorAll('.overlay-page').forEach((el) => {
+    if (el !== page) closeOverlayPage(el, false);
+  });
+  page.style.display = 'block';
+  requestAnimationFrame(() => page.classList.add('is-open'));
+  syncOverlayBackdrop();
+  if (page.id === 'reviewsPage' && typeof renderAllReviews === 'function') renderAllReviews();
+}
+
+function closeOverlayPage(page, syncBackdrop = true) {
+  if (!page || !page.classList.contains('is-open')) {
+    if (page && page.style.display === 'block' && !page.classList.contains('is-open')) {
+      page.style.display = 'none';
+    }
+    if (syncBackdrop) syncOverlayBackdrop();
+    return;
+  }
+  page.classList.remove('is-open');
+  const onEnd = (e) => {
+    if (e.target !== page || e.propertyName !== 'opacity') return;
+    page.removeEventListener('transitionend', onEnd);
+    if (!page.classList.contains('is-open')) page.style.display = 'none';
+    if (syncBackdrop) syncOverlayBackdrop();
+  };
+  page.addEventListener('transitionend', onEnd);
+}
+
+function toggleOverlayPage(page) {
+  if (!page) return;
+  if (page.classList.contains('is-open')) closeOverlayPage(page);
+  else openOverlayPage(page);
+}
+
+function hideOverlayPages() {
+  document.querySelectorAll('.overlay-page').forEach((page) => closeOverlayPage(page, false));
+  syncOverlayBackdrop();
+}
+
+function showReviewsPage() {
+  openOverlayPage(document.getElementById('reviewsPage'));
+}
+
+function showSettingsPage() {
+  openOverlayPage(document.getElementById('settingsPage'));
+}
+
 // Reviews/Settings panel handling
 document.addEventListener('DOMContentLoaded', () => {
   const openReviewsBtn = document.getElementById('openReviewsBtn');
   const openSettingsBtn = document.getElementById('openSettingsBtn');
   const reviewsSort = document.getElementById('reviewsSort');
+  const reviewsPage = document.getElementById('reviewsPage');
+  const settingsPage = document.getElementById('settingsPage');
+  const backdrop = overlayBackdrop();
 
-  if (openReviewsBtn) openReviewsBtn.onclick = () => showReviewsPage();
-  if (openSettingsBtn) openSettingsBtn.onclick = () => showSettingsPage();
-  // toggle behavior: clicking again closes
-  if (openReviewsBtn) openReviewsBtn.onclick = () => {
-    const rp = document.getElementById('reviewsPage');
-    const sp = document.getElementById('settingsPage');
-    if (sp) sp.style.display = 'none';
-    if (!rp) return; rp.style.display = rp.style.display === 'block' ? 'none' : 'block';
-    if (rp.style.display === 'block') { renderAllReviews(); rp.classList.add('open'); } else rp.classList.remove('open');
-    // dim background when an overlay is open
-    if (rp.style.display === 'block') document.body.classList.add('overlay-dim'); else document.body.classList.remove('overlay-dim');
-  };
-  if (openSettingsBtn) openSettingsBtn.onclick = () => {
-    const rp = document.getElementById('reviewsPage');
-    const sp = document.getElementById('settingsPage');
-    if (rp) rp.style.display = 'none';
-    if (!sp) return; sp.style.display = sp.style.display === 'block' ? 'none' : 'block';
-    if (sp.style.display === 'block') sp.classList.add('open'); else sp.classList.remove('open');
-    if (sp.style.display === 'block') document.body.classList.add('overlay-dim'); else document.body.classList.remove('overlay-dim');
-  };
+  if (openReviewsBtn) {
+    openReviewsBtn.onclick = () => toggleOverlayPage(reviewsPage);
+  }
+  if (openSettingsBtn) {
+    openSettingsBtn.onclick = () => toggleOverlayPage(settingsPage);
+  }
+  if (backdrop) {
+    backdrop.addEventListener('click', hideOverlayPages);
+  }
   if (reviewsSort) reviewsSort.onchange = () => renderAllReviews();
 
   // expand labels on hover after 500ms
@@ -1029,26 +1100,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-function hideOverlayPages() {
-  const rp = document.getElementById('reviewsPage');
-  const sp = document.getElementById('settingsPage');
-  if (rp) rp.style.display = 'none';
-  if (sp) sp.style.display = 'none';
-}
-
-function showReviewsPage() {
-  const rp = document.getElementById('reviewsPage');
-  if (!rp) return;
-  rp.style.display = 'block';
-  renderAllReviews();
-}
-
-function showSettingsPage() {
-  const sp = document.getElementById('settingsPage');
-  if (!sp) return;
-  sp.style.display = 'block';
-}
-
 // THEMES
 function applyTheme(name) {
   // remove any existing theme-* class then add the requested one
@@ -1063,13 +1114,6 @@ function applyTheme(name) {
     updateDoc(userRef, { theme: name }).catch(() => {});
   }
   markActiveThemeTile(name);
-  // mark active tile and ensure overlays inherit theme (CSS variables handle colors)
-  markActiveThemeTile(name);
-  // ensure overlays get .open styling when visible
-  const rp = document.getElementById('reviewsPage');
-  const sp = document.getElementById('settingsPage');
-  if (rp && rp.style.display === 'block') rp.classList.add('open');
-  if (sp && sp.style.display === 'block') sp.classList.add('open');
 }
 
 function loadStoredTheme() {
