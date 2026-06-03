@@ -66,7 +66,7 @@ html.theme-warm { --bg:#f3e7d6; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fff
 html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:#0d0818; --border:#1f1235; --accent:#7b2cbf; --accent2:#4a90e2; --accent-text:#f0e6ff; --preview-bg: rgba(10,5,18,0.95); }
 
 /* Hatsune Miku theme: cyan/teal with red accents */
-html.theme-hatsune { --bg:#0a1a20; --text:#39d5ff; --muted:#4a8fa3; --panel-bg:#0d2028; --border:#1a3a45; --accent:#39d5ff; --accent2:#ff0040; --accent-text:#0a1a20; --preview-bg: rgba(10,26,32,0.95); }
+html.theme-hatsune { --bg:#006e70; --text:#39d5ff; --muted:#4a8fa3; --panel-bg:#0d2028; --border:#1a3a45; --accent:#39d5ff; --accent2:#ff0040; --accent-text:#0a1a20; --preview-bg: rgba(10,26,32,0.95); }
 html.theme-hatsune::before {
   content: '';
   position: fixed;
@@ -74,7 +74,7 @@ html.theme-hatsune::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('miku2.png');
+  background-image: url('miku2.jpg');
   background-repeat: no-repeat;
   background-position: right center;
   background-size: contain;
@@ -435,8 +435,8 @@ html.theme-meiko #welcomeHeader,
 html.theme-meiko .watch-list-movies,
 html.theme-meiko .watch-list-shows,
 html.theme-meiko #watchedSection {
-  border-color: rgba(255, 77, 42, 0.55);
-  box-shadow: 0 0 18px rgba(255, 77, 42, 0.95);
+  border-color: rgba(255, 50, 30, 0.55);
+  box-shadow: 0 0 18px rgba(255, 50, 30, 0.95);
 }
 @media (max-width: 700px) {
   .lists-row {
@@ -609,7 +609,7 @@ html.theme-hatsune #previewCard {
 html.theme-meiko .side-btn,
 html.theme-meiko .theme-tile,
 html.theme-meiko #previewCard {
-  box-shadow: 0 0 18px rgba(255, 77, 42, 0.95);
+  box-shadow: 0 0 18px rgba(255, 50, 30, 0.95);
 }
 
 /* Hacker matrix mouse trail */
@@ -730,7 +730,10 @@ html.theme-meiko #previewCard {
   }
   
   /* Oversized background images on mobile for scroll reveal */
-  html.theme-hatsune::before,
+  html.theme-hatsune::before {
+    background-size: 150% auto;
+    background-position: right center;
+  }
   html.theme-meiko::before {
     background-size: 150% auto;
     background-position: right center;

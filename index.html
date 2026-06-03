@@ -4,6 +4,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie List</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="miumovielogo.png">
+  <link rel="apple-touch-icon" href="miumovielogo.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     /* left pane for auth */
     #leftPane {
@@ -68,6 +72,9 @@
 
     <!-- left nav panel (theme-aware) -->
     <aside id="navPanel" class="nav-panel" aria-label="App navigation">
+      <div style="padding:12px; text-align:center;">
+        <img src="miumovielogo.png" alt="Movie List Logo" style="width:40px; height:40px; object-fit:contain;">
+      </div>
       <div id="sideIcons" class="side-icons">
         <div class="side-item" data-action="reviews">
           <button id="openReviewsBtn" class="side-btn" title="My Reviews" type="button">📝</button>
