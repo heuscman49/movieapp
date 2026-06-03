@@ -985,7 +985,11 @@ if (setUsernameBtn) {
     }
 
     updateProfile(user, { displayName: uname })
-      .then(() => {
+      .then(async () => {
+        // Also update Firestore to persist the username
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, { name: uname });
+        
         if (usernameSection) usernameSection.style.display = 'none';
         if (appSection) appSection.style.display = 'block';
         if (usernameDisplay) usernameDisplay.textContent = uname;

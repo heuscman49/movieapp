@@ -47,8 +47,8 @@ html.theme-dark-mode { --bg:#0e0e0e; --text:#f2f2f2; --muted:#9a9a9a; --panel-bg
 /* Cyberpunk theme: strong violet, light blue, black */
 html.theme-cyberpunk { --bg:#05030a; --text:#f3e8ff; --muted:#b39ddf; --panel-bg:#0b0710; --border:#2a1840; --accent:#9b59ff; --accent2:#00d4ff; --accent-text:#0b0b0b; --preview-bg: rgba(8,4,16,0.95); }
 
-/* Midnight theme: warm red/orange, warm light grey and black */
-html.theme-midnight { --bg:#080608; --text:#ffe9db; --muted:#b88a78; --panel-bg:#0b0b0b; --border:#33221a; --accent:#ff6f3c; --accent-text:#1b0700; --preview-bg: rgba(8,4,4,0.95); }
+/* Rustic theme: warm red/orange, warm light grey and black */
+html.theme-rustic { --bg:#080608; --text:#ffe9db; --muted:#b88a78; --panel-bg:#0b0b0b; --border:#33221a; --accent:#ff6f3c; --accent-text:#1b0700; --preview-bg: rgba(8,4,4,0.95); }
 
 /* Shallows theme — softened light blue */
 html.theme-shallows { --bg:#d2e8f0; --text:#06324a; --muted:#5a8fa3; --panel-bg:#c4dde8; --border:#a8cdd9; --accent:#0096be; --accent-text:#eef9ff; --preview-bg: rgba(2,40,60,0.95); }
@@ -61,6 +61,9 @@ html.theme-forest { --bg:#0c1810; --text:#6fa872; --muted:#4d7354; --panel-bg:#1
 
 /* Warm theme — default-like layout with warmer whites */
 html.theme-warm { --bg:#faf6f0; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fffdf8; --border:#ebe3d8; --accent:#c67b4a; --accent-text:#fffaf5; --preview-bg: rgba(36,28,22,0.95); }
+
+/* Midnight theme: dark purples and blues */
+html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:#0d0818; --border:#1f1235; --accent:#7b2cbf; --accent2:#4a90e2; --accent-text:#f0e6ff; --preview-bg: rgba(10,5,18,0.95); }
 
 /* Left login pane */
 #leftPane { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; padding: 20px; background: var(--panel-bg); box-shadow: 2px 0 6px rgba(0,0,0,0.05); color:var(--text); border-right:1px solid var(--border); }
@@ -190,7 +193,7 @@ html.theme-warm { --bg:#faf6f0; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fff
   justify-content: center;
   width: 100%;
   max-width: 1100px;
-  margin: 16px auto 0;
+  margin: 40px auto 0;
   box-sizing: border-box;
 }
 .watch-list {
@@ -231,6 +234,42 @@ html.theme-hacker .watch-list-shows,
 html.theme-hacker #watchedSection {
   border-color: rgba(10, 155, 58, 0.55);
   box-shadow: 0 0 18px rgba(6, 120, 40, 0.95);
+}
+
+/* Nether glow on bordered sections */
+html.theme-nether #welcomeHeader,
+html.theme-nether .watch-list-movies,
+html.theme-nether .watch-list-shows,
+html.theme-nether #watchedSection {
+  border-color: rgba(139, 0, 0, 0.55);
+  box-shadow: 0 0 18px rgba(139, 0, 0, 0.95);
+}
+
+/* Cyberpunk glow on bordered sections (vibrant turquoise) */
+html.theme-cyberpunk #welcomeHeader,
+html.theme-cyberpunk .watch-list-movies,
+html.theme-cyberpunk .watch-list-shows,
+html.theme-cyberpunk #watchedSection {
+  border-color: rgba(0, 212, 255, 0.55);
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.95);
+}
+
+/* Ocean glow on bordered sections */
+html.theme-ocean #welcomeHeader,
+html.theme-ocean .watch-list-movies,
+html.theme-ocean .watch-list-shows,
+html.theme-ocean #watchedSection {
+  border-color: rgba(93, 212, 255, 0.55);
+  box-shadow: 0 0 18px rgba(93, 212, 255, 0.95);
+}
+
+/* Dark mode glow on bordered sections */
+html.theme-dark-mode #welcomeHeader,
+html.theme-dark-mode .watch-list-movies,
+html.theme-dark-mode .watch-list-shows,
+html.theme-dark-mode #watchedSection {
+  border-color: rgba(74, 144, 226, 0.55);
+  box-shadow: 0 0 18px rgba(74, 144, 226, 0.95);
 }
 @media (max-width: 700px) {
   .lists-row {
@@ -325,6 +364,34 @@ html.theme-hacker #previewCard {
 html.theme-hacker .star.selected {
   text-shadow: none;
   box-shadow: none;
+}
+
+/* Nether glow on controls */
+html.theme-nether .side-btn,
+html.theme-nether .theme-tile,
+html.theme-nether #previewCard {
+  box-shadow: 0 0 18px rgba(139, 0, 0, 0.95);
+}
+
+/* Cyberpunk glow on controls (vibrant turquoise) */
+html.theme-cyberpunk .side-btn,
+html.theme-cyberpunk .theme-tile,
+html.theme-cyberpunk #previewCard {
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.95);
+}
+
+/* Ocean glow on controls */
+html.theme-ocean .side-btn,
+html.theme-ocean .theme-tile,
+html.theme-ocean #previewCard {
+  box-shadow: 0 0 18px rgba(93, 212, 255, 0.95);
+}
+
+/* Dark mode glow on controls */
+html.theme-dark-mode .side-btn,
+html.theme-dark-mode .theme-tile,
+html.theme-dark-mode #previewCard {
+  box-shadow: 0 0 18px rgba(74, 144, 226, 0.95);
 }
 
 /* Hacker matrix mouse trail */

@@ -81,22 +81,23 @@
 
     <div id="overlayBackdrop" aria-hidden="true"></div>
 
-    <input id="searchInput" placeholder="Search movies or shows" autocomplete="off">
-
     <div id="searchDropdown" style="
       position: relative;
       width: 300px;
+      margin: 0 auto;
     ">
+      <input id="searchInput" placeholder="Search movies or shows" autocomplete="off" style="width: 100%; box-sizing: border-box;">
 
       <div id="resultsBox" style="
         position: absolute;
-        top: 5px;
+        top: 100%;
         left: 0;
         right: 0;
         max-height: 200px;
         overflow-y: auto;
         z-index: 999;
         display: none;
+        margin-top: 4px;
       "></div>
 
     </div>
@@ -121,6 +122,7 @@
         <div class="theme-tile" data-theme="cute">Cute</div>
         <div class="theme-tile" data-theme="nether">Nether</div>
         <div class="theme-tile" data-theme="cyberpunk">Cyberpunk</div>
+        <div class="theme-tile" data-theme="rustic">Rustic</div>
         <div class="theme-tile" data-theme="midnight">Midnight</div>
         <div class="theme-tile" data-theme="shallows">Shallows</div>
         <div class="theme-tile" data-theme="ocean">Ocean</div>
