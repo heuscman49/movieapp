@@ -1032,20 +1032,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadStoredTheme();
 });
 
-async function loadRecentActivity() {
-  if (!currentUser) return;
-  const snap = await getDoc(doc(db, 'users', currentUser.uid));
-  const data = snap.data() || {};
-  const recent = (data.activity || []).slice().reverse().slice(0, 20);
-  const list = document.getElementById('ratingsList');
-  if (!list) return; list.innerHTML = '';
-  recent.forEach(a => {
-    const li = document.createElement('li');
-    li.textContent = a;
-    list.appendChild(li);
-  });
-}
-
 async function renderAllReviews() {
   if (!currentUser) return;
   const snap = await getDoc(doc(db, 'users', currentUser.uid));
