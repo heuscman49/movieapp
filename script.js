@@ -473,7 +473,8 @@ window.saveEditedReview = async (index) => {
 
 function checkAdmin(user) {
   if (user && user.email === "georgebossingto@gmail.com") {
-    document.getElementById("adminPanel").style.display = "block";
+    const adminBtn = document.getElementById('openAdminBtn');
+    if (adminBtn) adminBtn.style.display = 'flex';
     loadUsers();
   }
 }
@@ -716,19 +717,6 @@ async function showApp(user) {
   if (typeof loadWatched === 'function') loadWatched();
   // load ratings panel
   if (typeof loadRatings === 'function') loadRatings();
-
-  // show admin panel for a specific admin email
-  try {
-    const activeUser = auth.currentUser || currentUser;
-    const adminPanel = document.getElementById('adminPanel');
-    if (activeUser && activeUser.email === "georgebossingto@gmail.com") {
-      if (adminPanel) adminPanel.style.display = 'block';
-    } else {
-      if (adminPanel) adminPanel.style.display = 'none';
-    }
-  } catch (err) {
-    console.error('Error toggling admin panel', err);
-  }
 }
 
 // Load user data from Firestore and populate UI
@@ -915,9 +903,11 @@ async function loadUsers() {
 
     li.style.padding = "8px";
     li.style.marginBottom = "6px";
-    li.style.background = "#eee";
+    li.style.background = "var(--panel-bg)";
+    li.style.border = "1px solid var(--border)";
     li.style.borderRadius = "6px";
     li.style.cursor = "pointer";
+    li.style.color = "var(--text)";
 
     li.onclick = () => showUserData(docSnap.id);
 
@@ -941,17 +931,17 @@ async function showUserData(uid) {
   const data = snap.data();
 
   if (box) box.innerHTML = `
-    <h3>👤 ${data.name}</h3>
+    <h3 style="color:var(--text);">👤 ${data.name}</h3>
 
-    <p><b>Email:</b> ${data.email}</p>
+    <p style="color:var(--text);"><b>Email:</b> ${data.email}</p>
 
-    <h4>🎬 Movies</h4>
-    <ul>
+    <h4 style="color:var(--text);">🎬 Movies</h4>
+    <ul style="color:var(--text); padding-left:1.25rem;">
       ${(data.movies || []).map(item => `<li>${(item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item}</li>`).join("")}
     </ul>
 
-    <h4>📺 Shows</h4>
-    <ul>
+    <h4 style="color:var(--text);">📺 Shows</h4>
+    <ul style="color:var(--text); padding-left:1.25rem;">
       ${(data.shows || []).map(item => `<li>${(item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item}</li>`).join("")}
     </ul>
   `;
@@ -1168,6 +1158,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.mobile-close-btn').forEach(btn => {
     btn.onclick = () => hideOverlayPages();
   });
+
+  // Admin panel button
+  const openAdminBtn = document.getElementById('openAdminBtn');
+  const adminPanel = document.getElementById('adminPanel');
+  if (openAdminBtn && adminPanel) {
+    openAdminBtn.onclick = () => toggleOverlayPage(adminPanel);
+  }
 
   // Edit review button
   const editReviewBtn = document.getElementById('editReviewBtn');

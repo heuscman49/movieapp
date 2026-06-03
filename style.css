@@ -67,9 +67,39 @@ html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:
 
 /* Hatsune Miku theme: cyan/teal with red accents */
 html.theme-hatsune { --bg:#0a1a20; --text:#39d5ff; --muted:#4a8fa3; --panel-bg:#0d2028; --border:#1a3a45; --accent:#39d5ff; --accent2:#ff0040; --accent-text:#0a1a20; --preview-bg: rgba(10,26,32,0.95); }
+html.theme-hatsune::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('miku2.png');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
 
 /* Meiko theme: brown, red, dark red */
-html.theme-meiko { --bg:#1a0a08; --text:#ff8a6b; --muted:#a85a4a; --panel-bg:#200d0a; --border:#3a1a15; --accent:#ff4d2a; --accent2:#8b0000; --accent-text:#1a0a08; --preview-bg: rgba(26,10,8,0.95); }
+html.theme-meiko { --bg:linear-gradient(to bottom, #8b0000, #1a0a08); --text:#ff8a6b; --muted:#a85a4a; --panel-bg:#200d0a; --border:#3a1a15; --accent:#ff4d2a; --accent2:#8b0000; --accent-text:#1a0a08; --preview-bg: rgba(26,10,8,0.95); }
+html.theme-meiko::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('meiko.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
 
 /* Left login pane */
 #leftPane { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; padding: 20px; background: var(--panel-bg); box-shadow: 2px 0 6px rgba(0,0,0,0.05); color:var(--text); border-right:1px solid var(--border); }
@@ -396,8 +426,8 @@ html.theme-hatsune #welcomeHeader,
 html.theme-hatsune .watch-list-movies,
 html.theme-hatsune .watch-list-shows,
 html.theme-hatsune #watchedSection {
-  border-color: rgba(57, 213, 255, 0.55);
-  box-shadow: 0 0 18px rgba(57, 213, 255, 0.95);
+  border-color: rgba(255, 0, 64, 0.55);
+  box-shadow: 0 0 18px rgba(255, 0, 64, 0.95);
 }
 
 /* Meiko glow on bordered sections */
@@ -572,7 +602,7 @@ html.theme-midnight #previewCard {
 html.theme-hatsune .side-btn,
 html.theme-hatsune .theme-tile,
 html.theme-hatsune #previewCard {
-  box-shadow: 0 0 18px rgba(57, 213, 255, 0.95);
+  box-shadow: 0 0 18px rgba(255, 0, 64, 0.95);
 }
 
 /* Meiko glow on controls */
@@ -697,6 +727,13 @@ html.theme-meiko #previewCard {
 @media (max-width: 768px) {
   #hatsuneTrail {
     display: none !important;
+  }
+  
+  /* Oversized background images on mobile for scroll reveal */
+  html.theme-hatsune::before,
+  html.theme-meiko::before {
+    background-size: 150% auto;
+    background-position: right center;
   }
 }
 
