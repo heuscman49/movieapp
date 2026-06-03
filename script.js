@@ -63,23 +63,29 @@ async function markWatched(type, index) {
   if (!userSnap.exists()) return console.error('User doc missing');
 
   const data = userSnap.data() || {};
-  const item =
-    type === 'movie'
-      ? (data.movies || [])[index]
-      : (data.shows || [])[index];
+  const arr = type === 'movie' ? (data.movies || []) : (data.shows || []);
+  if (index < 0 || index >= arr.length) return console.error('Index OOB');
 
+  const item = arr[index];
   if (!item) return console.error('Item not found');
 
-  await updateDoc(userRef, {
-    watched: arrayUnion({
-      ...item,
-      type,
-      rating: 0,
-      review: ""
-    })
-  });
+  // remove from original array
+  const newArr = arr.slice();
+  newArr.splice(index, 1);
 
-  console.log('Moved to watched');
+  const watchedItem = {
+    ...item,
+    type,
+    rating: 0,
+    review: ""
+  };
+
+  const updatePayload = { watched: arrayUnion(watchedItem) };
+  updatePayload[type + 's'] = newArr;
+
+  await updateDoc(userRef, updatePayload);
+
+  console.log('Moved to watched and removed from list');
 
   // refresh UI where appropriate
   if (typeof loadUserData === 'function') loadUserData();
@@ -210,8 +216,8 @@ async function loadWatched() {
 
         <div class="watched-controls">
           <input id="rating-input-${i}" type="hidden" value="${w.rating || ''}">
-          <input id="review-input-${i}" type="text" class="watched-review-input" placeholder="Review" value="${(w.review||'').replace(/"/g, '&quot;')}" onchange="setReview(${i}, this.value)">
-          <button onclick="submitRating(${i})">Submit</button>
+          <textarea id="review-input-${i}" class="watched-review-input" placeholder="Review" onchange="setReview(${i}, this.value)">${(w.review||'').replace(/</g,'&lt;')}</textarea>
+          <div class="watched-control-row"><button onclick="submitRating(${i})">Submit</button></div>
         </div>
       </div>
     `;
