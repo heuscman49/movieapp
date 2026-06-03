@@ -34,6 +34,9 @@ body.theme-cyberpunk { --bg:#05030a; --text:#f3e8ff; --muted:#b39ddf; --panel-bg
 /* Midnight theme: warm red/orange, warm light grey and black */
 body.theme-midnight { --bg:#080608; --text:#ffe9db; --muted:#b88a78; --panel-bg:#0b0b0b; --border:#33221a; --accent:#ff6f3c; --accent-text:#1b0700; --preview-bg: rgba(8,4,4,0.95); }
 
+/* Shallows theme (was previously called Ocean) - light with blue accents */
+body.theme-shallows { --bg:#e9f7fb; --text:#06324a; --muted:#6b9fb5; --panel-bg:#dff3f9; --border:#bfeaf6; --accent:#00a8d4; --accent-text:#eef9ff; --preview-bg: rgba(2,40,60,0.95); }
+
 /* Ocean theme: light blue and darker blue contrasts */
 body.theme-ocean { --bg:#e9f7fb; --text:#06324a; --muted:#6b9fb5; --panel-bg:#dff3f9; --border:#bfeaf6; --accent:#00a8d4; --accent-text:#eef9ff; --preview-bg: rgba(2,40,60,0.95); }
 
@@ -61,7 +64,7 @@ body.theme-forest { --bg:#f3faf3; --text:#12321a; --muted:#6a8a66; --panel-bg:#e
 .side-icons { transition: width 220ms ease; }
 
 /* Reviews/settings overlays */
-#reviewsPage, #settingsPage { position:fixed; left:80px; top:80px; right:80px; bottom:80px; background:#fff; border:1px solid #ddd; padding:16px; overflow:auto; border-radius:8px; z-index:1200; }
+#reviewsPage, #settingsPage { position:fixed; left:80px; top:80px; right:80px; bottom:80px; background:var(--panel-bg); border:1px solid var(--border); padding:16px; overflow:auto; border-radius:8px; z-index:1200; color:var(--text); }
 
 /* all reviews layout: responsive grid */
 #allReviewsList { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px; list-style:none; padding:0; margin:0; }
@@ -79,9 +82,20 @@ body.theme-forest { --bg:#f3faf3; --text:#12321a; --muted:#6a8a66; --panel-bg:#e
 .fade-in { animation: fadeIn 180ms ease forwards; transform-origin: top center; transform: scale(0.99); }
 @keyframes fadeIn { from { opacity:0; transform: translateY(-6px);} to { opacity:1; transform: translateY(0);} }
 
-/* moreMenu styles */
-#moreMenu { border-radius:8px; overflow:hidden; }
-#moreMenu div { padding:8px 12px; cursor:pointer; }
+/* moreMenu styles (compact 3-dot dropdown) */
+#moreMenu {
+  border-radius: 5px;
+  overflow: hidden;
+  padding: 2px;
+  font-size: 11px;
+  line-height: 1.2;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+#moreMenu div {
+  padding: 3px 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}
 #moreMenu div:hover { background: color-mix(in srgb, var(--panel-bg) 70%, var(--accent) 30%); }
 
 /* overlay dimming utility for modal/overlays */

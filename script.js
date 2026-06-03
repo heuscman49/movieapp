@@ -58,20 +58,10 @@ onAuthStateChanged(auth, (user) => {
     document.body.style.marginLeft = '260px';
   }
 
-function markActiveThemeTile(name) {
-  document.querySelectorAll('.theme-tile').forEach(t => t.classList.remove('active'));
-  const tile = document.querySelector(`.theme-tile[data-theme="${name}"]`);
-  if (tile) tile.classList.add('active');
-}
+/* markActiveThemeTile defined later; avoid duplicate */
 
-// prevent theme click causing brief active on side buttons by not focusing them
-document.addEventListener('click', (e) => {
-  if (e.target && e.target.classList && e.target.classList.contains('theme-tile')) {
-    e.preventDefault();
-    const name = e.target.getAttribute('data-theme');
-    if (name) applyTheme(name);
-  }
-});
+// Removed global delegated theme click handler to avoid conflicts.
+// Theme tile clicks are handled below in DOMContentLoaded with per-tile listeners.
 
 // mark an item watched by adding it to the user's watched array
 async function markWatched(type, index) {
@@ -939,9 +929,9 @@ if (moreBtn && moreMenu) {
       // position under the button
       const rect = moreBtn.getBoundingClientRect();
       moreMenu.style.position = 'fixed';
-      moreMenu.style.minWidth = '140px';
+      moreMenu.style.minWidth = '88px';
       moreMenu.style.left = (rect.left) + 'px';
-      moreMenu.style.top = (rect.bottom + 6) + 'px';
+      moreMenu.style.top = (rect.bottom + 4) + 'px';
     } else {
       moreMenu.classList.remove('fade-in');
       moreBtn.classList.remove('open');
@@ -1061,9 +1051,11 @@ function showSettingsPage() {
 
 // THEMES
 function applyTheme(name) {
-  // remove existing theme classes
-  document.body.classList.remove('theme-hacker','theme-cute','theme-nether','theme-default','theme-dark-mode');
-  document.body.classList.add('theme-' + name);
+  // remove any existing theme-* class then add the requested one
+  // keep non-theme classes, replace theme-* with the new theme
+  const keep = Array.from(document.body.classList).filter(c => !c.startsWith('theme-'));
+  keep.push('theme-' + name);
+  document.body.className = keep.join(' ');
   try { localStorage.setItem('movieapp-theme', name); } catch (e) {}
   // persist user preference
   if (currentUser) {
@@ -1093,16 +1085,41 @@ function markActiveThemeTile(name) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // theme tiles
-  document.querySelectorAll('.theme-tile').forEach(tile => {
-    tile.addEventListener('click', () => {
+  const themesGrid = document.getElementById('themesGrid');
+  if (themesGrid) {
+    themesGrid.addEventListener('click', (ev) => {
+      const tile = ev.target.closest('.theme-tile');
+      if (!tile || !themesGrid.contains(tile)) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (tile.blur) tile.blur();
       const name = tile.getAttribute('data-theme');
+      if (!name) return;
       applyTheme(name);
     });
-  });
+  }
 
   loadStoredTheme();
+  // bind explicit handlers after theme grid is present
+  bindThemeTileListeners();
 });
+// Ensure theme tiles have explicit click handlers (some browsers/edge-cases need direct binding)
+function bindThemeTileListeners() {
+  document.querySelectorAll('.theme-tile').forEach(tile => {
+    // remove any previous handler if present (stored on element)
+    if (tile._themeHandler) tile.removeEventListener('click', tile._themeHandler);
+    const handler = function onTileClick(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (tile.blur) tile.blur();
+      const name = tile.getAttribute('data-theme');
+      if (!name) return;
+      applyTheme(name);
+    };
+    tile._themeHandler = handler;
+    tile.addEventListener('click', handler);
+  });
+}
 
 async function renderAllReviews() {
   if (!currentUser) return;
