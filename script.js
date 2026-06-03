@@ -52,6 +52,10 @@ onAuthStateChanged(auth, (user) => {
     currentUser = null;
     if (authSection) authSection.style.display = 'block';
     if (appSection) appSection.style.display = 'none';
+    const leftPane = document.getElementById('leftPane');
+    if (leftPane) leftPane.style.display = 'block';
+    // restore layout spacing
+    document.body.style.marginLeft = '260px';
   }
 
 // mark an item watched by adding it to the user's watched array
@@ -197,30 +201,53 @@ async function loadWatched() {
 
   watched.forEach((w, i) => {
     const li = document.createElement("li");
-
-    // render star rating UI (click to select) + hidden input for value
-    const currentRating = w.rating || 0;
+    // if already reviewed (has rating), show static stars + review text and no inputs
+    const hasRating = w && w.rating; // truthy rating indicates submitted
     let starsHtml = '';
-    for (let s = 1; s <= 5; s++) {
-      const filled = s <= currentRating ? 'selected' : '';
-      starsHtml += `<span class="star ${filled}" data-value="${s}" onclick="selectStar(${i}, ${s})">★</span>`;
+    const currentRating = w.rating || 0;
+
+    if (hasRating) {
+      for (let s = 1; s <= 5; s++) {
+        const filled = s <= currentRating ? 'selected' : '';
+        // no onclick for static stars
+        starsHtml += `<span class="star ${filled}" data-value="${s}">★</span>`;
+      }
+
+      li.innerHTML = `
+        <div class="watched-item">
+          <div class="watched-title"><strong>${w.title}</strong></div>
+
+          <div class="watched-rating-row">
+            <div class="stars" id="stars-${i}">${starsHtml}</div>
+          </div>
+
+          <div class="watched-controls">
+            <div class="watched-review-display"><span class="review-submitted">Review submitted</span></div>
+          </div>
+        </div>
+      `;
+    } else {
+      // interactive UI when not yet submitted
+      for (let s = 1; s <= 5; s++) {
+        starsHtml += `<span class="star" data-value="${s}" onclick="selectStar(${i}, ${s})">★</span>`;
+      }
+
+      li.innerHTML = `
+        <div class="watched-item">
+          <div class="watched-title"><strong>${w.title}</strong></div>
+
+          <div class="watched-rating-row">
+            <div class="stars" id="stars-${i}">${starsHtml}</div>
+          </div>
+
+          <div class="watched-controls">
+            <input id="rating-input-${i}" type="hidden" value="${w.rating || ''}">
+            <textarea id="review-input-${i}" class="watched-review-input" placeholder="Review" onchange="setReview(${i}, this.value)">${(w.review||'').replace(/</g,'&lt;')}</textarea>
+            <div class="watched-control-row"><button onclick="submitRating(${i})">Submit</button></div>
+          </div>
+        </div>
+      `;
     }
-
-    li.innerHTML = `
-      <div class="watched-item">
-        <div class="watched-title"><strong>${w.title}</strong></div>
-
-        <div class="watched-rating-row">
-          <div class="stars" id="stars-${i}">${starsHtml}</div>
-        </div>
-
-        <div class="watched-controls">
-          <input id="rating-input-${i}" type="hidden" value="${w.rating || ''}">
-          <textarea id="review-input-${i}" class="watched-review-input" placeholder="Review" onchange="setReview(${i}, this.value)">${(w.review||'').replace(/</g,'&lt;')}</textarea>
-          <div class="watched-control-row"><button onclick="submitRating(${i})">Submit</button></div>
-        </div>
-      </div>
-    `;
 
     // preview handlers for watched items
     li.addEventListener('mouseenter', (e) => {
@@ -597,6 +624,10 @@ async function showApp(user) {
   if (usernameSection) usernameSection.style.display = 'none';
   // show app
   if (appSection) appSection.style.display = 'block';
+  // hide left pane and shift content left
+  const leftPane = document.getElementById('leftPane');
+  if (leftPane) leftPane.style.display = 'none';
+  document.body.style.marginLeft = '0px';
 
   // set username display, prefer passed user, then auth.currentUser, then currentUser
   const activeUser = user || auth.currentUser || currentUser;
