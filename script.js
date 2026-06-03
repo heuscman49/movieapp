@@ -1169,6 +1169,26 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.onclick = () => hideOverlayPages();
   });
 
+  // Edit review button
+  const editReviewBtn = document.getElementById('editReviewBtn');
+  if (editReviewBtn) {
+    editReviewBtn.onclick = async () => {
+      if (selectedReviews.size !== 1) return;
+      const index = Array.from(selectedReviews)[0];
+      await editReview(index);
+    };
+  }
+
+  // Delete reviews button
+  const deleteReviewsBtn = document.getElementById('deleteReviewsBtn');
+  if (deleteReviewsBtn) {
+    deleteReviewsBtn.onclick = async () => {
+      if (selectedReviews.size === 0) return;
+      if (!confirm(`Delete ${selectedReviews.size} review(s)?`)) return;
+      await deleteSelectedReviews();
+    };
+  }
+
   // expand labels on hover after 500ms
   document.querySelectorAll('.side-item').forEach(item => {
     let hoverTimer = null;
@@ -1348,6 +1368,9 @@ function bindThemeTileListeners() {
   });
 }
 
+// Track selected reviews for bulk operations
+let selectedReviews = new Set();
+
 async function renderAllReviews() {
   if (!currentUser) return;
   const snap = await getDoc(doc(db, 'users', currentUser.uid));
@@ -1368,9 +1391,182 @@ async function renderAllReviews() {
 
   items.forEach((w, i) => {
     const li = document.createElement('li');
-    li.innerHTML = `<strong>${w.title}</strong><br>⭐ ${w.rating} — ${w.review || ''}`;
+    li.style.display = 'flex';
+    li.style.alignItems = 'flex-start';
+    li.style.gap = '8px';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'review-checkbox';
+    checkbox.dataset.index = i;
+    checkbox.dataset.originalIndex = watched.indexOf(w);
+    checkbox.style.marginTop = '4px';
+    checkbox.checked = selectedReviews.has(watched.indexOf(w));
+    checkbox.onchange = (e) => {
+      const idx = parseInt(e.target.dataset.originalIndex);
+      if (e.target.checked) {
+        selectedReviews.add(idx);
+      } else {
+        selectedReviews.delete(idx);
+      }
+      updateEditButtonState();
+    };
+    
+    const content = document.createElement('div');
+    content.style.flex = '1';
+    content.innerHTML = `<strong>${w.title}</strong><br>⭐ ${w.rating} — ${w.review || ''}`;
+    
+    li.appendChild(checkbox);
+    li.appendChild(content);
     list.appendChild(li);
   });
+  
+  updateEditButtonState();
+}
+
+function updateEditButtonState() {
+  const editBtn = document.getElementById('editReviewBtn');
+  if (editBtn) {
+    editBtn.disabled = selectedReviews.size !== 1;
+    editBtn.style.opacity = selectedReviews.size !== 1 ? '0.5' : '1';
+    editBtn.style.cursor = selectedReviews.size !== 1 ? 'not-allowed' : 'pointer';
+  }
+}
+
+async function editReview(index) {
+  const snap = await getDoc(doc(db, 'users', currentUser.uid));
+  const data = snap.data() || {};
+  const watched = Array.isArray(data.watched) ? data.watched : [];
+  const review = watched[index];
+  
+  if (!review) return;
+  
+  const list = document.getElementById('allReviewsList');
+  const li = list.children[index];
+  
+  // Replace content with editable form
+  li.innerHTML = '';
+  li.style.flexDirection = 'column';
+  li.style.gap = '8px';
+  
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.className = 'review-checkbox';
+  checkbox.dataset.originalIndex = index;
+  checkbox.checked = selectedReviews.has(index);
+  checkbox.onchange = (e) => {
+    const idx = parseInt(e.target.dataset.originalIndex);
+    if (e.target.checked) {
+      selectedReviews.add(idx);
+    } else {
+      selectedReviews.delete(idx);
+    }
+    updateEditButtonState();
+  };
+  
+  const form = document.createElement('div');
+  form.style.flex = '1';
+  form.style.width = '100%';
+  
+  const titleInput = document.createElement('input');
+  titleInput.type = 'text';
+  titleInput.value = review.title || '';
+  titleInput.style.width = '100%';
+  titleInput.style.padding = '6px';
+  titleInput.style.marginBottom = '8px';
+  titleInput.style.border = '1px solid var(--border)';
+  titleInput.style.borderRadius = '4px';
+  titleInput.style.background = 'var(--panel-bg)';
+  titleInput.style.color = 'var(--text)';
+  titleInput.placeholder = 'Title';
+  
+  const ratingInput = document.createElement('input');
+  ratingInput.type = 'number';
+  ratingInput.min = '1';
+  ratingInput.max = '5';
+  ratingInput.value = review.rating || '';
+  ratingInput.style.width = '60px';
+  ratingInput.style.padding = '6px';
+  ratingInput.style.marginBottom = '8px';
+  ratingInput.style.border = '1px solid var(--border)';
+  ratingInput.style.borderRadius = '4px';
+  ratingInput.style.background = 'var(--panel-bg)';
+  ratingInput.style.color = 'var(--text)';
+  ratingInput.placeholder = 'Rating';
+  
+  const reviewInput = document.createElement('textarea');
+  reviewInput.value = review.review || '';
+  reviewInput.style.width = '100%';
+  reviewInput.style.minHeight = '60px';
+  reviewInput.style.padding = '6px';
+  reviewInput.style.marginBottom = '8px';
+  reviewInput.style.border = '1px solid var(--border)';
+  reviewInput.style.borderRadius = '4px';
+  reviewInput.style.background = 'var(--panel-bg)';
+  reviewInput.style.color = 'var(--text)';
+  reviewInput.placeholder = 'Review';
+  reviewInput.style.resize = 'vertical';
+  
+  const buttonRow = document.createElement('div');
+  buttonRow.style.display = 'flex';
+  buttonRow.style.gap = '8px';
+  
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save';
+  saveBtn.style.padding = '6px 12px';
+  saveBtn.style.borderRadius = '6px';
+  saveBtn.style.border = '1px solid var(--border)';
+  saveBtn.style.background = 'var(--panel-bg)';
+  saveBtn.style.color = 'var(--text)';
+  saveBtn.style.cursor = 'pointer';
+  saveBtn.onclick = async () => {
+    const updatedReview = {
+      ...review,
+      title: titleInput.value,
+      rating: parseInt(ratingInput.value),
+      review: reviewInput.value
+    };
+    watched[index] = updatedReview;
+    await updateDoc(doc(db, 'users', currentUser.uid), { watched });
+    selectedReviews.clear();
+    renderAllReviews();
+  };
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.padding = '6px 12px';
+  cancelBtn.style.borderRadius = '6px';
+  cancelBtn.style.border = '1px solid var(--border)';
+  cancelBtn.style.background = 'var(--panel-bg)';
+  cancelBtn.style.color = 'var(--text)';
+  cancelBtn.style.cursor = 'pointer';
+  cancelBtn.onclick = () => {
+    renderAllReviews();
+  };
+  
+  buttonRow.appendChild(saveBtn);
+  buttonRow.appendChild(cancelBtn);
+  
+  form.appendChild(titleInput);
+  form.appendChild(ratingInput);
+  form.appendChild(reviewInput);
+  form.appendChild(buttonRow);
+  
+  li.appendChild(checkbox);
+  li.appendChild(form);
+}
+
+async function deleteSelectedReviews() {
+  const snap = await getDoc(doc(db, 'users', currentUser.uid));
+  const data = snap.data() || {};
+  const watched = Array.isArray(data.watched) ? data.watched : [];
+  
+  // Remove selected reviews (filter out selected indices)
+  const newWatched = watched.filter((_, i) => !selectedReviews.has(i));
+  
+  await updateDoc(doc(db, 'users', currentUser.uid), { watched: newWatched });
+  selectedReviews.clear();
+  renderAllReviews();
 }
 
 // render recent activity instead of static ratings
