@@ -38,6 +38,62 @@ onAuthStateChanged(auth, (user) => {
     if (appSection) appSection.style.display = 'none';
   }
 
+// mark an item watched by adding it to the user's watched array
+async function markWatched(type, index) {
+  if (!currentUser) return alert('Not signed in');
+
+  const userRef = doc(db, 'users', currentUser.uid);
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) return console.error('User doc missing');
+
+  const data = userSnap.data() || {};
+  const item =
+    type === 'movie'
+      ? (data.movies || [])[index]
+      : (data.shows || [])[index];
+
+  if (!item) return console.error('Item not found');
+
+  await updateDoc(userRef, {
+    watched: arrayUnion({
+      ...item,
+      type,
+      rating: 0,
+      review: ""
+    })
+  });
+
+  console.log('Moved to watched');
+
+  // refresh UI where appropriate
+  if (typeof loadUserData === 'function') loadUserData();
+  if (typeof loadWatched === 'function') loadWatched();
+}
+
+// expose markWatched and deleteItem for inline onclick handlers
+window.markWatched = markWatched;
+
+// delete function: remove item by index from movies/shows arrays
+window.deleteItem = async (type, index) => {
+  if (!currentUser) return alert('Not signed in');
+
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return console.error('User doc missing');
+  const data = snap.data() || {};
+
+  const updated =
+    type === "movie"
+      ? (data.movies || []).filter((_, i) => i !== index)
+      : (data.shows || []).filter((_, i) => i !== index);
+
+  await updateDoc(userRef, {
+    [type + "s"]: updated
+  });
+
+  if (typeof loadUserData === 'function') loadUserData();
+};
+
 });
 
 async function searchMovies(query) {
@@ -98,36 +154,62 @@ async function addMedia(item) {
 }
 
 async function loadWatched() {
-  const filter = document.getElementById("filterType").value;
+  const filterEl = document.getElementById("filterType");
+  const filter = filterEl ? filterEl.value : "all";
 
   const snap = await getDoc(doc(db, "users", currentUser.uid));
-  const data = snap.data();
-
-  let items = [];
-
-  if (filter === "all" || filter === "movies") {
-    items.push(...(data.movies || []).filter(m => m.watched));
-  }
-
-  if (filter === "all" || filter === "shows") {
-    items.push(...(data.shows || []).filter(s => s.watched));
-  }
+  const data = snap.data() || {};
 
   const container = document.getElementById("watchedList");
+  if (!container) return;
   container.innerHTML = "";
 
-  items.forEach(item => {
-    const div = document.createElement("div");
+  // determine watched items depending on filter
+  let watched = Array.isArray(data.watched) ? data.watched : [];
 
-    div.innerHTML = `
-      <h4>${item.title}</h4>
-      <p>⭐ ${item.rating || "N/A"}</p>
-      <p>${item.review || ""}</p>
+  if (filter === "movies") {
+    watched = watched.filter(w => w.type === "movie");
+  } else if (filter === "shows") {
+    watched = watched.filter(w => w.type === "show");
+  }
+
+  watched.forEach((w, i) => {
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      ⭐ ${w.title}
+
+      <input type="number" min="1" max="5" placeholder="Rating" value="${w.rating || ''}" onchange="setRating(${i}, this.value)">
+      <input type="text" placeholder="Review" value="${(w.review||'').replace(/"/g, '&quot;')}" onchange="setReview(${i}, this.value)">
     `;
 
-    container.appendChild(div);
+    container.appendChild(li);
   });
 }
+
+window.setRating = async (index, value) => {
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
+
+  const data = snap.data();
+  const watched = data.watched;
+
+  watched[index].rating = Number(value);
+
+  await updateDoc(userRef, { watched });
+};
+
+window.setReview = async (index, value) => {
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
+
+  const data = snap.data();
+  const watched = data.watched;
+
+  watched[index].review = value;
+
+  await updateDoc(userRef, { watched });
+};
 
 
 function checkAdmin(user) {
@@ -303,7 +385,8 @@ document.getElementById("signupBtn").onclick = () => {
         name: email.split("@")[0],
         email: email,
         movies: [],
-        shows: []
+        shows: [],
+        watched: []
       });
 
       console.log("User added to Firestore");
@@ -362,49 +445,36 @@ async function loadUserData() {
     const moviesList = document.getElementById('moviesList');
     if (moviesList) {
       moviesList.innerHTML = '';
-      movies.forEach(m => {
+      movies.forEach((m, index) => {
         const title = (m && typeof m === 'object') ? (m.title || m.name || 'Untitled') : m;
         const li = document.createElement('li');
 
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = title;
+        li.innerHTML = `
+          🎬 ${title}
 
-        const reviewBtn = document.createElement('button');
-        reviewBtn.textContent = 'review';
-        reviewBtn.style.marginLeft = '8px';
-        reviewBtn.onclick = () => openReview('movie', title);
+          <button onclick="markWatched('movie', ${index})" style="margin-left:8px;">
+            Watched
+          </button>
 
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'delete';
-        delBtn.style.marginLeft = '6px';
-        delBtn.onclick = () => li.remove();
+          <button onclick="deleteItem('movie', ${index})" style="margin-left:6px;">
+            Delete
+          </button>
+        `;
 
-        li.appendChild(titleSpan);
-        li.appendChild(reviewBtn);
-        li.appendChild(delBtn);
-
-        // preview on hover for stored items
+        // preview on hover for stored items (map stored shape to expected preview shape)
         li.addEventListener("mouseenter", (e) => {
-          // map stored object to expected preview shape
           const previewItem = {
-            title: m.title || m.name,
-            name: m.name || m.title,
-            poster_path: m.poster || m.poster_path,
-            release_date: m.date || m.release_date,
-            first_air_date: m.date || m.first_air_date,
-            overview: m.overview || m.overview
+            title: m && (m.title || m.name) || title,
+            name: m && (m.name || m.title) || title,
+            poster_path: m && (m.poster || m.poster_path),
+            release_date: m && (m.date || m.release_date),
+            first_air_date: m && (m.date || m.first_air_date),
+            overview: m && (m.overview || "")
           };
           showPreview(previewItem, e.clientX, e.clientY);
         });
 
-        li.addEventListener("mousemove", (e) => {
-          const preview = document.getElementById("previewCard");
-          if (preview) {
-            preview.style.left = e.clientX + 15 + "px";
-            preview.style.top = e.clientY + 15 + "px";
-          }
-        });
-
+        li.addEventListener("mousemove", (e) => clampPreviewPosition(e.clientX, e.clientY));
         li.addEventListener("mouseleave", hidePreview);
 
         moviesList.appendChild(li);
@@ -415,39 +485,24 @@ async function loadUserData() {
     const shows = Array.isArray(data.shows) ? data.shows : [];
     const showsList = document.getElementById('showsList');
     if (showsList) {
-      showsList.innerHTML = '';
-      shows.forEach(s => {
-        const title = (s && typeof s === 'object') ? (s.title || s.name || 'Untitled') : s;
-        const li = document.createElement('li');
+      showsList.innerHTML = "";
 
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = title;
+      shows.forEach((s, index) => {
+        const title = s && s.title ? s.title : s;
 
-        const reviewBtn = document.createElement('button');
-        reviewBtn.textContent = 'review';
-        reviewBtn.style.marginLeft = '8px';
-        reviewBtn.onclick = () => openReview('show', title);
+        const li = document.createElement("li");
 
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'delete';
-        delBtn.style.marginLeft = '6px';
-        delBtn.onclick = () => li.remove();
+        li.innerHTML = `
+          📺 ${title}
 
-        li.appendChild(titleSpan);
-        li.appendChild(reviewBtn);
-        li.appendChild(delBtn);
+          <button onclick="markWatched('show', ${index})">
+            Watched
+          </button>
 
-        li.addEventListener("mouseenter", (e) => {
-          showPreview(s, e.clientX, e.clientY);
-        });
-
-        li.addEventListener("mousemove", (e) => {
-          const preview = document.getElementById("previewCard");
-          preview.style.left = e.clientX + 15 + "px";
-          preview.style.top = e.clientY + 15 + "px";
-        });
-
-        li.addEventListener("mouseleave", hidePreview);
+          <button onclick="deleteItem('show', ${index})">
+            Delete
+          </button>
+        `;
 
         showsList.appendChild(li);
       });
