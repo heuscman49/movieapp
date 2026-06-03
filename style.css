@@ -79,8 +79,8 @@ html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:
 
 @media (max-width: 768px) {
   #appSection {
-    margin-left: 0;
-    padding: 12px 16px 32px;
+    margin-left: 60px;
+    padding: 8px 12px 24px;
   }
 }
 
@@ -113,6 +113,36 @@ html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:
   .side-label {
     left: 48px;
     font-size: 12px;
+  }
+  
+  /* Make search bar smaller on mobile */
+  #searchDropdown {
+    width: calc(100% - 20px);
+    max-width: 280px;
+  }
+  #searchFilterBtn {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  #searchInput {
+    padding: 6px;
+    font-size: 14px;
+  }
+  
+  /* Make welcome header smaller */
+  #welcomeHeader {
+    font-size: 18px;
+    padding: 8px 12px;
+  }
+  
+  /* Make list headers smaller */
+  .watch-list h2 {
+    font-size: 18px;
+  }
+  
+  /* Make watched section header smaller */
+  #watchedSection h2 {
+    font-size: 18px;
   }
 }
 
@@ -175,6 +205,9 @@ html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:
     top: 20px;
     bottom: 20px;
     padding: 12px;
+  }
+  .mobile-close-btn {
+    display: block !important;
   }
 }
 .overlay-page.is-open {

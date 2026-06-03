@@ -1164,6 +1164,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (reviewsSort) reviewsSort.onchange = () => renderAllReviews();
 
+  // Mobile close buttons for overlay pages
+  document.querySelectorAll('.mobile-close-btn').forEach(btn => {
+    btn.onclick = () => hideOverlayPages();
+  });
+
   // expand labels on hover after 500ms
   document.querySelectorAll('.side-item').forEach(item => {
     let hoverTimer = null;
