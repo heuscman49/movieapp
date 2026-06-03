@@ -207,14 +207,28 @@ html.theme-warm { --bg:#faf6f0; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fff
 .watch-list .item-title {
   cursor: pointer;
 }
-.watch-list-shows {
-  border: 1px solid transparent;
+
+/* Bordered sections — all themes (glow only on hacker) */
+#welcomeHeader,
+.watch-list-movies,
+.watch-list-shows,
+#watchedSection {
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 14px 14px;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-html.theme-hacker .watch-list-shows {
+#welcomeHeader {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 10px 16px;
+  position: relative;
+}
+html.theme-hacker #welcomeHeader,
+html.theme-hacker .watch-list-movies,
+html.theme-hacker .watch-list-shows,
+html.theme-hacker #watchedSection {
   border-color: rgba(10, 155, 58, 0.55);
   box-shadow: 0 0 18px rgba(6, 120, 40, 0.95);
 }
@@ -384,7 +398,7 @@ html.theme-hacker .star.selected {
 /* Watched list spacing and layout */
 #watchedSection {
   margin-top: 56px;
-  padding-top: 8px;
+  max-width: 1100px;
 }
 #watchedList li { padding: 12px 0; }
 .watched-item { display:block; max-width:420px; box-sizing:border-box; color:var(--text); }

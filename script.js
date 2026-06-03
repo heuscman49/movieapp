@@ -1146,7 +1146,7 @@ const cuteTrail = (() => {
   let container = null;
   let enabled = false;
   let lastSpawn = 0;
-  const charms = ['❤️', '💕', '💖', '🌸', '🌷', '🌺', '💗', '🌼'];
+  const charms = ['❤️', '💕', '💖', '🌸', '🌷', '🌺', '💗'];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function ensureContainer() {
