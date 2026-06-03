@@ -1299,6 +1299,56 @@ const cuteTrail = (() => {
   return { setEnabled };
 })();
 
+const hatsuneTrail = (() => {
+  let container = null;
+  let enabled = false;
+  let lastSpawn = 0;
+  const bits = ['0', '1', '🎧'];
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ensureContainer() {
+    if (container) return container;
+    container = document.getElementById('hatsuneTrail');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'hatsuneTrail';
+      container.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(container);
+    }
+    return container;
+  }
+
+  function spawn(x, y) {
+    const el = document.createElement('span');
+    el.className = 'hatsune-trail-bit';
+    el.textContent = bits[Math.floor(Math.random() * bits.length)];
+    el.style.left = `${x + (Math.random() * 12 - 6)}px`;
+    el.style.top = `${y + (Math.random() * 8 - 4)}px`;
+    ensureContainer().appendChild(el);
+    requestAnimationFrame(() => el.classList.add('fall'));
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }
+
+  function onMove(e) {
+    if (!enabled) return;
+    const now = performance.now();
+    if (now - lastSpawn < 38) return;
+    lastSpawn = now;
+    spawn(e.clientX, e.clientY);
+    if (Math.random() < 0.5) spawn(e.clientX - 8, e.clientY + 6);
+  }
+
+  function setEnabled(on) {
+    enabled = on && !reducedMotion;
+    const c = ensureContainer();
+    c.classList.toggle('active', enabled);
+    if (!enabled) c.innerHTML = '';
+  }
+
+  document.addEventListener('mousemove', onMove, { passive: true });
+  return { setEnabled };
+})();
+
 function applyTheme(name) {
   const themeClass = 'theme-' + name;
   const html = document.documentElement;
@@ -1310,6 +1360,7 @@ function applyTheme(name) {
   });
   hackerTrail.setEnabled(name === 'hacker');
   cuteTrail.setEnabled(name === 'cute');
+  hatsuneTrail.setEnabled(name === 'hatsune');
   try { localStorage.setItem('movieapp-theme', name); } catch (e) {}
   // persist user preference
   if (currentUser) {
