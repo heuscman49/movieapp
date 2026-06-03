@@ -209,6 +209,23 @@ async function loadWatched() {
       <button onclick="submitRating(${i})">Submit</button>
     `;
 
+    // preview handlers for watched items
+    li.addEventListener('mouseenter', (e) => {
+      const previewItem = {
+        title: w && (w.title || w.name) || '',
+        name: w && (w.name || w.title) || '',
+        poster_path: w && (w.poster || w.poster_path) || '',
+        release_date: w && (w.date || w.release_date) || '',
+        first_air_date: w && (w.date || w.first_air_date) || '',
+        overview: w && (w.overview || '') || '',
+        media_type: w && (w.type === 'movie' ? 'movie' : (w.type === 'show' ? 'tv' : undefined))
+      };
+      showPreview(previewItem, e.clientX, e.clientY);
+    });
+
+    li.addEventListener('mousemove', (e) => clampPreviewPosition(e.clientX, e.clientY));
+    li.addEventListener('mouseleave', hidePreview);
+
     container.appendChild(li);
   });
 }
