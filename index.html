@@ -22,6 +22,9 @@
     /* ensure authSection controls layout */
     #authSection input { display: block; width: 100%; margin: 6px 0; padding: 8px; box-sizing: border-box; }
     #authSection button { margin-right: 6px; }
+    /* three dots icon and rotation helper */
+    .dotsIcon { display:inline-block; transition: transform .18s ease; }
+    .rotate { transform: rotate(90deg); }
   </style>
 </head>
 
@@ -54,7 +57,7 @@
   <!-- APP SECTION -->
   <div id="appSection" style="display:none;">
     <h1 id="welcomeHeader">Welcome <span id="usernameDisplay"></span>
-      <button id="moreBtn" aria-haspopup="true" aria-expanded="false" style="margin-left:12px; border:none; background:transparent; font-size:20px; cursor:pointer;">⋯</button>
+      <button id="moreBtn" aria-haspopup="true" aria-expanded="false" style="margin-left:12px; border:none; background:transparent; font-size:20px; cursor:pointer;"><span class="dotsIcon">⋯</span></button>
 
       <div id="moreMenu" style="display:none; position:absolute; margin-top:8px; right:20px; background:var(--panel-bg); border:1px solid var(--border); padding:8px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.12); z-index:1500;">
         <div id="menuChangeUsername" style="padding:6px 10px; cursor:pointer;">Change username</div>
@@ -62,10 +65,7 @@
       </div>
     </h1>
 
-    <div id="ratingsPanel">
-      <h3 style="margin:0 0 8px 0;">Recent Activity</h3>
-      <ul id="ratingsList"></ul>
-    </div>
+
 
     <!-- floating side icons panel -->
     <div id="sideIcons" class="side-icons">
@@ -122,6 +122,7 @@
         <div class="theme-tile" data-theme="nether">Nether</div>
         <div class="theme-tile" data-theme="cyberpunk">Cyberpunk</div>
         <div class="theme-tile" data-theme="midnight">Midnight</div>
+        <div class="theme-tile" data-theme="shallows">Shallows</div>
         <div class="theme-tile" data-theme="ocean">Ocean</div>
         <div class="theme-tile" data-theme="forest">Forest</div>
         <div class="theme-tile" data-theme="default">Default</div>
@@ -129,13 +130,19 @@
       </div>
     </div>
 
-    <h2>Movies to watch:</h2>
-    <ul id="moviesList"></ul>
+    <div class="lists-row" style="display:flex; gap:24px; align-items:flex-start;">
+      <div style="flex:1;">
+        <h2>Movies to watch:</h2>
+        <ul id="moviesList"></ul>
+      </div>
 
-    <h2>Shows to watch:</h2>
-    <ul id="showsList"></ul>
+      <div style="width:360px;">
+        <h2>Shows to watch:</h2>
+        <ul id="showsList"></ul>
+      </div>
+    </div>
 
-    <div id="watchedSection">
+    <div id="watchedSection" style="margin-top:24px;">
       <h2>Watched</h2>
       <ul id="watchedList"></ul>
     </div>

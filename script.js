@@ -58,6 +58,21 @@ onAuthStateChanged(auth, (user) => {
     document.body.style.marginLeft = '260px';
   }
 
+function markActiveThemeTile(name) {
+  document.querySelectorAll('.theme-tile').forEach(t => t.classList.remove('active'));
+  const tile = document.querySelector(`.theme-tile[data-theme="${name}"]`);
+  if (tile) tile.classList.add('active');
+}
+
+// prevent theme click causing brief active on side buttons by not focusing them
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.classList && e.target.classList.contains('theme-tile')) {
+    e.preventDefault();
+    const name = e.target.getAttribute('data-theme');
+    if (name) applyTheme(name);
+  }
+});
+
 // mark an item watched by adding it to the user's watched array
 async function markWatched(type, index) {
   if (!currentUser) return alert('Not signed in');
@@ -918,7 +933,19 @@ if (moreBtn && moreMenu) {
   moreBtn.onclick = () => {
     const shown = moreMenu.style.display === 'block';
     moreMenu.style.display = shown ? 'none' : 'block';
-    if (!shown) moreMenu.classList.add('fade-in'); else moreMenu.classList.remove('fade-in');
+    if (!shown) {
+      moreMenu.classList.add('fade-in');
+      moreBtn.classList.add('open');
+      // position under the button
+      const rect = moreBtn.getBoundingClientRect();
+      moreMenu.style.position = 'fixed';
+      moreMenu.style.minWidth = '140px';
+      moreMenu.style.left = (rect.left) + 'px';
+      moreMenu.style.top = (rect.bottom + 6) + 'px';
+    } else {
+      moreMenu.classList.remove('fade-in');
+      moreBtn.classList.remove('open');
+    }
   };
 }
 
@@ -982,13 +1009,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const rp = document.getElementById('reviewsPage');
     const sp = document.getElementById('settingsPage');
     if (sp) sp.style.display = 'none';
-    if (!rp) return; rp.style.display = rp.style.display === 'block' ? 'none' : 'block'; if (rp.style.display === 'block') renderAllReviews();
+    if (!rp) return; rp.style.display = rp.style.display === 'block' ? 'none' : 'block';
+    if (rp.style.display === 'block') { renderAllReviews(); rp.classList.add('open'); } else rp.classList.remove('open');
+    // dim background when an overlay is open
+    if (rp.style.display === 'block') document.body.classList.add('overlay-dim'); else document.body.classList.remove('overlay-dim');
   };
   if (openSettingsBtn) openSettingsBtn.onclick = () => {
     const rp = document.getElementById('reviewsPage');
     const sp = document.getElementById('settingsPage');
     if (rp) rp.style.display = 'none';
     if (!sp) return; sp.style.display = sp.style.display === 'block' ? 'none' : 'block';
+    if (sp.style.display === 'block') sp.classList.add('open'); else sp.classList.remove('open');
+    if (sp.style.display === 'block') document.body.classList.add('overlay-dim'); else document.body.classList.remove('overlay-dim');
   };
   if (reviewsSort) reviewsSort.onchange = () => renderAllReviews();
 
@@ -1039,13 +1071,13 @@ function applyTheme(name) {
     updateDoc(userRef, { theme: name }).catch(() => {});
   }
   markActiveThemeTile(name);
-  // visual feedback on side buttons
-  document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-  const activeBtn = document.querySelector(`.side-item[data-action="reviews"] .side-btn`);
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-    setTimeout(() => activeBtn.classList.remove('active'), 220);
-  }
+  // mark active tile and ensure overlays inherit theme (CSS variables handle colors)
+  markActiveThemeTile(name);
+  // ensure overlays get .open styling when visible
+  const rp = document.getElementById('reviewsPage');
+  const sp = document.getElementById('settingsPage');
+  if (rp && rp.style.display === 'block') rp.classList.add('open');
+  if (sp && sp.style.display === 'block') sp.classList.add('open');
 }
 
 function loadStoredTheme() {
