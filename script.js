@@ -587,55 +587,6 @@ if (setUsernameBtn) {
       });
   };
 }
-
-// MOVIE FUNCTIONS
-async function addMovie() {
-  const input = document.getElementById("movieInput");
-  const list = document.getElementById("moviesList");
-
-  if (input.value === "" || !currentUser) return;
-
-  const movie = input.value;
-
-  // save to Firestore
-  const userRef = doc(db, "users", currentUser.uid);
-
-  await updateDoc(userRef, {
-    movies: arrayUnion({
-      title: movie,
-      watched: false,
-      rating: null,
-      review: ""
-    })
-  });
-
-  // update UI
-  const li = document.createElement("li");
-  li.innerHTML = movie + ' <button onclick="this.parentElement.remove()">delete</button>';
-  list.appendChild(li);
-
-  input.value = "";
-}
-
-// SHOW FUNCTIONS
-function addShow() {
-  const input = document.getElementById("showInput");
-  const list = document.getElementById("showsList");
-
-  if (input.value === "") return;
-
-  const li = document.createElement("li");
-  li.innerHTML =
-    input.value +
-    ' <button onclick="this.parentElement.remove()">delete</button>';
-
-  list.appendChild(li);
-  input.value = "";
-}
-
-// Make functions accessible to HTML buttons
-window.addMovie = addMovie;
-window.addShow = addShow;
 // Expose addMedia and openReview globally for onclick handlers
 window.addMedia = addMedia;
 window.openReview = openReview;
