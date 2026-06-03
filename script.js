@@ -319,6 +319,7 @@ window.submitRating = async (index) => {
   // refresh watched UI and ratings panel
   if (typeof loadWatched === 'function') loadWatched();
   if (typeof loadRatings === 'function') loadRatings();
+  if (typeof loadRecentActivity === 'function') loadRecentActivity();
 };
 
 // populate the top-right ratings panel with reviewed items (with edit/delete)
@@ -999,6 +1000,50 @@ function showSettingsPage() {
   const sp = document.getElementById('settingsPage');
   if (!sp) return;
   sp.style.display = 'block';
+}
+
+// THEMES
+function applyTheme(name) {
+  // remove existing theme classes
+  document.body.classList.remove('theme-hacker','theme-cute','theme-nether','theme-default','theme-dark-mode');
+  document.body.classList.add('theme-' + name);
+  try { localStorage.setItem('movieapp-theme', name); } catch (e) {}
+  // persist user preference
+  if (currentUser) {
+    const userRef = doc(db, 'users', currentUser.uid);
+    updateDoc(userRef, { theme: name }).catch(() => {});
+  }
+}
+
+function loadStoredTheme() {
+  const t = localStorage.getItem('movieapp-theme');
+  if (t) applyTheme(t);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // theme tiles
+  document.querySelectorAll('.theme-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const name = tile.getAttribute('data-theme');
+      applyTheme(name);
+    });
+  });
+
+  loadStoredTheme();
+});
+
+async function loadRecentActivity() {
+  if (!currentUser) return;
+  const snap = await getDoc(doc(db, 'users', currentUser.uid));
+  const data = snap.data() || {};
+  const recent = (data.activity || []).slice().reverse().slice(0, 20);
+  const list = document.getElementById('ratingsList');
+  if (!list) return; list.innerHTML = '';
+  recent.forEach(a => {
+    const li = document.createElement('li');
+    li.textContent = a;
+    list.appendChild(li);
+  });
 }
 
 async function renderAllReviews() {
