@@ -54,8 +54,8 @@ main, .content {
 }
 
 #previewCard img {
-  width: 100%;
+  width: 80px;
   height: auto;
-  border-radius: 10px;
+  border-radius: 8px;
   object-fit: cover;
 }

@@ -165,12 +165,51 @@ function showPreview(item, x, y) {
   if (!preview) return;
 
   preview.innerHTML = `
-    <img src="${poster}" style="width:100%; border-radius:10px; margin-bottom:8px;">
-    <h3 style="margin:0;">${title}</h3>
-    <div style="font-size:12px; opacity:0.7;">${date}</div>
-    <p style="font-size:12px; margin-top:8px;">
-      ${overview.slice(0, 120)}...
-    </p>
+    <div style="padding:12px;">
+
+    <h3 style="
+      margin:0 0 4px 0;
+      font-size:18px;
+    ">
+      ${title}
+    </h3>
+
+    <div style="
+      font-size:12px;
+      color:#aaa;
+      margin-bottom:10px;
+    ">
+      ${date}
+      ${item.media_type ? ` • ${item.media_type === "movie" ? "Movie" : "Show"}` : ""}
+    </div>
+
+    <div style="
+      display:flex;
+      justify-content:center;
+      margin-bottom:10px;
+    ">
+      <img
+        src="${poster}"
+        style="
+          width:120px;
+          height:auto;
+          border-radius:8px;
+          object-fit:cover;
+        "
+      >
+    </div>
+
+    <div style="
+      font-size:13px;
+      line-height:1.4;
+      color:#ddd;
+    ">
+      ${overview.length > 250
+        ? overview.slice(0, 250) + "..."
+        : overview}
+    </div>
+
+  </div>
   `;
   // position first, then show and trigger transition
   preview.style.left = x + 15 + "px";
