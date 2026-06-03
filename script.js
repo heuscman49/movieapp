@@ -476,51 +476,19 @@ function showPreview(item, x, y) {
   if (!preview) return;
 
   preview.innerHTML = `
-    <div style="padding:12px;">
-
-    <h3 style="
-      margin:0 0 4px 0;
-      font-size:18px;
-    ">
-      ${title}
-    </h3>
-
-    <div style="
-      font-size:12px;
-      color:#aaa;
-      margin-bottom:10px;
-    ">
-      ${date}
-      ${item.media_type ? ` • ${item.media_type === "movie" ? "Movie" : "Show"}` : ""}
+    <div class="preview-card-body">
+      <h3 class="preview-card-title">${title}</h3>
+      <div class="preview-card-meta">
+        ${date}
+        ${item.media_type ? ` • ${item.media_type === "movie" ? "Movie" : "Show"}` : ""}
+      </div>
+      <div class="preview-card-poster-wrap">
+        <img class="preview-card-poster" src="${poster}" alt="">
+      </div>
+      <div class="preview-card-overview">
+        ${overview.length > 250 ? overview.slice(0, 250) + "..." : overview}
+      </div>
     </div>
-
-    <div style="
-      display:flex;
-      justify-content:center;
-      margin-bottom:10px;
-    ">
-      <img
-        src="${poster}"
-        style="
-          width:120px;
-          height:auto;
-          border-radius:8px;
-          object-fit:cover;
-        "
-      >
-    </div>
-
-    <div style="
-      font-size:13px;
-      line-height:1.4;
-      color:#ddd;
-    ">
-      ${overview.length > 250
-        ? overview.slice(0, 250) + "..."
-        : overview}
-    </div>
-
-  </div>
   `;
   // position first, then show and trigger transition
   preview.style.left = x + 15 + "px";
@@ -1101,12 +1069,63 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // THEMES
+const hackerTrail = (() => {
+  let container = null;
+  let enabled = false;
+  let lastSpawn = 0;
+  const bits = ['0', '1'];
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ensureContainer() {
+    if (container) return container;
+    container = document.createElement('div');
+    container.id = 'hackerTrail';
+    container.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(container);
+    return container;
+  }
+
+  function spawn(x, y) {
+    const el = document.createElement('span');
+    el.className = 'hacker-trail-bit';
+    el.textContent = bits[Math.random() < 0.5 ? 0 : 1];
+    el.style.left = `${x + (Math.random() * 12 - 6)}px`;
+    el.style.top = `${y + (Math.random() * 8 - 4)}px`;
+    ensureContainer().appendChild(el);
+    requestAnimationFrame(() => el.classList.add('fall'));
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }
+
+  function onMove(e) {
+    if (!enabled) return;
+    const now = performance.now();
+    if (now - lastSpawn < 36) return;
+    lastSpawn = now;
+    spawn(e.clientX, e.clientY);
+    if (Math.random() < 0.55) spawn(e.clientX - 10, e.clientY + 6);
+  }
+
+  function setEnabled(on) {
+    enabled = on && !reducedMotion;
+    const c = ensureContainer();
+    c.classList.toggle('active', enabled);
+    if (!enabled) c.innerHTML = '';
+  }
+
+  document.addEventListener('mousemove', onMove, { passive: true });
+  return { setEnabled };
+})();
+
 function applyTheme(name) {
-  // remove any existing theme-* class then add the requested one
-  // keep non-theme classes, replace theme-* with the new theme
-  const keep = Array.from(document.body.classList).filter(c => !c.startsWith('theme-'));
-  keep.push('theme-' + name);
-  document.body.className = keep.join(' ');
+  const themeClass = 'theme-' + name;
+  const html = document.documentElement;
+  const keep = Array.from(html.classList).filter((c) => !c.startsWith('theme-'));
+  keep.push(themeClass);
+  html.className = keep.join(' ');
+  document.body.classList.forEach((c) => {
+    if (c.startsWith('theme-')) document.body.classList.remove(c);
+  });
+  hackerTrail.setEnabled(name === 'hacker');
   try { localStorage.setItem('movieapp-theme', name); } catch (e) {}
   // persist user preference
   if (currentUser) {

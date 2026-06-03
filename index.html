@@ -52,8 +52,6 @@
     <button id="setUsernameBtn">Set Username</button>
   </div>
 
-  <hr>
-
   <!-- APP SECTION -->
   <div id="appSection" style="display:none;">
     <h1 id="welcomeHeader">Welcome <span id="usernameDisplay"></span>
@@ -127,6 +125,7 @@
         <div class="theme-tile" data-theme="shallows">Shallows</div>
         <div class="theme-tile" data-theme="ocean">Ocean</div>
         <div class="theme-tile" data-theme="forest">Forest</div>
+        <div class="theme-tile" data-theme="warm">Warm</div>
         <div class="theme-tile" data-theme="default">Default</div>
         <div class="theme-tile" data-theme="dark-mode">Dark Mode</div>
       </div>
@@ -185,18 +184,7 @@
 
   <script type="module" src="script.js"></script>
 
-  <div id="previewCard" style="
-    position: fixed;
-    display: none;
-    width: 260px;
-    background: #111;
-    color: white;
-    border-radius: 10px;
-    padding: 10px;
-    z-index: 9999;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  ">
-  </div>
+  <div id="previewCard"></div>
 
 </body>
 </html>
