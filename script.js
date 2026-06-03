@@ -191,6 +191,9 @@ async function loadWatched() {
   const filterEl = document.getElementById("filterType");
   const filter = filterEl ? filterEl.value : "all";
 
+  const sortEl = document.getElementById("watchedSort");
+  const sortOrder = sortEl ? sortEl.value : "newest";
+
   const snap = await getDoc(doc(db, "users", currentUser.uid));
   const data = snap.data() || {};
 
@@ -206,6 +209,12 @@ async function loadWatched() {
   } else if (filter === "shows") {
     watched = watched.filter(w => w.type === "show");
   }
+
+  // sort by newest/oldest (using array index as proxy for order)
+  if (sortOrder === "newest") {
+    watched = watched.slice().reverse();
+  }
+  // oldest is default order (no change needed)
 
   watched.forEach((w, i) => {
     const li = document.createElement("li");
@@ -1675,6 +1684,9 @@ async function loadRecentActivity() {
 
 const filterEl = document.getElementById("filterType");
 if (filterEl) filterEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };
+
+const watchedSortEl = document.getElementById("watchedSort");
+if (watchedSortEl) watchedSortEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };
 
 // Search filter functionality
 let searchFilter = 'all';
