@@ -33,7 +33,7 @@ hr {
 html.theme-hacker { --bg:#070707; --text:#2d8a47; --muted:#4a6b52; --panel-bg:#050505; --border:#111; --accent:#0a9b3a; --accent-text:#002200; --preview-bg: rgba(0,0,0,0.95); }
 
 /* Theme: cute (soft pink/white) */
-html.theme-cute { --bg:#ffb3d6; --text:#331827; --muted:#8a6f7a; --panel-bg:#fff0f6; --border:#ffd6e9; --accent:#ff4d8b; --accent-text:#fff; --preview-bg: rgba(255,245,250,0.95); }
+html.theme-cute { --bg:#ffc2df; --text:#331827; --muted:#8a6f7a; --panel-bg:#fff0f6; --border:#ffd6e9; --accent:#ff4d8b; --accent-text:#fff; --preview-bg: rgba(255,245,250,0.95); }
 
 /* Theme: nether (dark red/black) */
 html.theme-nether { --bg:#070101; --text:#ffdede; --muted:#8b4d4d; --panel-bg:#120303; --border:#3a0000; --accent:#8b0000; --accent-text:#fff; --preview-bg: rgba(10,0,0,0.95); }
@@ -60,7 +60,7 @@ html.theme-ocean { --bg:#041828; --text:#c8ecff; --muted:#6a9fc4; --panel-bg:#06
 html.theme-forest { --bg:#0c1810; --text:#6fa872; --muted:#4d7354; --panel-bg:#122018; --border:#1e3424; --accent:#3d9b4a; --accent-text:#0a140c; --preview-bg: rgba(6,30,12,0.95); }
 
 /* Warm theme — default-like layout with warmer whites */
-html.theme-warm { --bg:#ebdecc; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fffdf8; --border:#ebe3d8; --accent:#c67b4a; --accent-text:#fffaf5; --preview-bg: rgba(36,28,22,0.95); }
+html.theme-warm { --bg:#f3e7d6; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fffdf8; --border:#ebe3d8; --accent:#c67b4a; --accent-text:#fffaf5; --preview-bg: rgba(36,28,22,0.95); }
 
 /* Midnight theme: dark purples and blues */
 html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:#0d0818; --border:#1f1235; --accent:#7b2cbf; --accent2:#4a90e2; --accent-text:#f0e6ff; --preview-bg: rgba(10,5,18,0.95); }
@@ -117,8 +117,8 @@ html.theme-midnight { --bg:#0a0512; --text:#e8d5ff; --muted:#9d7bb8; --panel-bg:
   
   /* Make search bar smaller on mobile */
   #searchDropdown {
-    width: calc(100% - 20px);
-    max-width: 280px;
+    width: calc(100% - 80px);
+    max-width: 260px;
   }
   #searchFilterBtn {
     padding: 6px 10px;
