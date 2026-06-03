@@ -204,6 +204,20 @@ html.theme-warm { --bg:#faf6f0; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fff
   margin: 0;
   padding-left: 1.25rem;
 }
+.watch-list .item-title {
+  cursor: pointer;
+}
+.watch-list-shows {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 14px 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+html.theme-hacker .watch-list-shows {
+  border-color: rgba(10, 155, 58, 0.55);
+  box-shadow: 0 0 18px rgba(6, 120, 40, 0.95);
+}
 @media (max-width: 700px) {
   .lists-row {
     grid-template-columns: 1fr;
@@ -329,11 +343,49 @@ html.theme-hacker .star.selected {
   to { opacity: 0; transform: translate(-50%, calc(-50% + 52px)); }
 }
 
+/* Cute theme mouse trail — hearts & flowers */
+#cuteTrail {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+  display: none;
+}
+#cuteTrail.active { display: block; }
+.cute-trail-bit {
+  position: fixed;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.95;
+  user-select: none;
+  pointer-events: none;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 1px 2px rgba(255, 100, 150, 0.35));
+}
+.cute-trail-bit.fall {
+  animation: cuteBitFall 1.05s ease-in forwards;
+}
+@keyframes cuteBitFall {
+  from {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translate(calc(-50% + 6px), calc(-50% + 44px)) scale(0.75) rotate(12deg);
+  }
+}
+
 /* remove pulsing globally */
 @keyframes pulseGlow { }
 .stars { display:inline-block; margin-right:8px; }
 
 /* Watched list spacing and layout */
+#watchedSection {
+  margin-top: 56px;
+  padding-top: 8px;
+}
 #watchedList li { padding: 12px 0; }
 .watched-item { display:block; max-width:420px; box-sizing:border-box; color:var(--text); }
 .watched-title { margin-bottom:6px; color:var(--text); }

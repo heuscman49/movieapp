@@ -570,15 +570,15 @@ function startPreviewAutoScroll() {
       return;
     }
 
-    pos += dir * 0.45;
+    pos += dir * 0.18;
     if (pos >= max) {
       pos = max;
       dir = -1;
-      pauseUntil = now + 1400;
+      pauseUntil = now + 1800;
     } else if (pos <= 0) {
       pos = 0;
       dir = 1;
-      pauseUntil = now + 1400;
+      pauseUntil = now + 1800;
     }
     scrollEl.scrollTop = pos;
     __previewAutoScrollRaf = requestAnimationFrame(tick);
@@ -773,13 +773,13 @@ async function loadUserData() {
         const li = document.createElement("li");
 
         li.innerHTML = `
-          📺 ${title}
+          <span class="item-title">📺 ${title}</span>
 
-          <button onclick="markWatched('show', ${index})">
+          <button onclick="markWatched('show', ${index})" style="margin-left:8px;">
             Watched
           </button>
 
-          <button onclick="deleteItem('show', ${index})">
+          <button onclick="deleteItem('show', ${index})" style="margin-left:6px;">
             Delete
           </button>
         `;
@@ -1142,6 +1142,53 @@ const hackerTrail = (() => {
   return { setEnabled };
 })();
 
+const cuteTrail = (() => {
+  let container = null;
+  let enabled = false;
+  let lastSpawn = 0;
+  const charms = ['❤️', '💕', '💖', '🌸', '🌷', '🌺', '💗', '🌼'];
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function ensureContainer() {
+    if (container) return container;
+    container = document.createElement('div');
+    container.id = 'cuteTrail';
+    container.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(container);
+    return container;
+  }
+
+  function spawn(x, y) {
+    const el = document.createElement('span');
+    el.className = 'cute-trail-bit';
+    el.textContent = charms[Math.floor(Math.random() * charms.length)];
+    el.style.left = `${x + (Math.random() * 14 - 7)}px`;
+    el.style.top = `${y + (Math.random() * 10 - 5)}px`;
+    ensureContainer().appendChild(el);
+    requestAnimationFrame(() => el.classList.add('fall'));
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  }
+
+  function onMove(e) {
+    if (!enabled) return;
+    const now = performance.now();
+    if (now - lastSpawn < 42) return;
+    lastSpawn = now;
+    spawn(e.clientX, e.clientY);
+    if (Math.random() < 0.5) spawn(e.clientX + 8, e.clientY + 5);
+  }
+
+  function setEnabled(on) {
+    enabled = on && !reducedMotion;
+    const c = ensureContainer();
+    c.classList.toggle('active', enabled);
+    if (!enabled) c.innerHTML = '';
+  }
+
+  document.addEventListener('mousemove', onMove, { passive: true });
+  return { setEnabled };
+})();
+
 function applyTheme(name) {
   const themeClass = 'theme-' + name;
   const html = document.documentElement;
@@ -1152,6 +1199,7 @@ function applyTheme(name) {
     if (c.startsWith('theme-')) document.body.classList.remove(c);
   });
   hackerTrail.setEnabled(name === 'hacker');
+  cuteTrail.setEnabled(name === 'cute');
   try { localStorage.setItem('movieapp-theme', name); } catch (e) {}
   // persist user preference
   if (currentUser) {
