@@ -249,22 +249,25 @@ async function loadWatched() {
       `;
     }
 
-    // preview handlers for watched items
-    li.addEventListener('mouseenter', (e) => {
-      const previewItem = {
-        title: w && (w.title || w.name) || '',
-        name: w && (w.name || w.title) || '',
-        poster_path: w && (w.poster || w.poster_path) || '',
-        release_date: w && (w.date || w.release_date) || '',
-        first_air_date: w && (w.date || w.first_air_date) || '',
-        overview: w && (w.overview || '') || '',
-        media_type: w && (w.type === 'movie' ? 'movie' : (w.type === 'show' ? 'tv' : undefined))
-      };
-      showPreview(previewItem, e.clientX, e.clientY);
-    });
+    // preview handlers attached to the title element only (limits hover area)
+    const titleEl = li.querySelector('.watched-title');
+    if (titleEl) {
+      titleEl.addEventListener('mouseenter', (e) => {
+        const previewItem = {
+          title: w && (w.title || w.name) || '',
+          name: w && (w.name || w.title) || '',
+          poster_path: w && (w.poster || w.poster_path) || '',
+          release_date: w && (w.date || w.release_date) || '',
+          first_air_date: w && (w.date || w.first_air_date) || '',
+          overview: w && (w.overview || '') || '',
+          media_type: w && (w.type === 'movie' ? 'movie' : (w.type === 'show' ? 'tv' : undefined))
+        };
+        showPreview(previewItem, e.clientX, e.clientY);
+      });
 
-    li.addEventListener('mousemove', (e) => clampPreviewPosition(e.clientX, e.clientY));
-    li.addEventListener('mouseleave', hidePreview);
+      titleEl.addEventListener('mousemove', (e) => clampPreviewPosition(e.clientX, e.clientY));
+      titleEl.addEventListener('mouseleave', hidePreview);
+    }
 
     container.appendChild(li);
   });
@@ -679,7 +682,7 @@ async function loadUserData() {
         const li = document.createElement('li');
 
         li.innerHTML = `
-          🎬 ${title}
+          <span class="item-title">🎬 ${title}</span>
 
           <button onclick="markWatched('movie', ${index})" style="margin-left:8px;">
             Watched
@@ -690,21 +693,25 @@ async function loadUserData() {
           </button>
         `;
 
-        // preview on hover for stored items (map stored shape to expected preview shape)
-        li.addEventListener("mouseenter", (e) => {
-          const previewItem = {
-            title: m && (m.title || m.name) || title,
-            name: m && (m.name || m.title) || title,
-            poster_path: m && (m.poster || m.poster_path),
-            release_date: m && (m.date || m.release_date),
-            first_air_date: m && (m.date || m.first_air_date),
-            overview: m && (m.overview || "")
-          };
-          showPreview(previewItem, e.clientX, e.clientY);
-        });
+        // preview only when hovering the title text
+        const movieTitleEl = li.querySelector('.item-title');
+        if (movieTitleEl) {
+          movieTitleEl.addEventListener("mouseenter", (e) => {
+            const previewItem = {
+              title: m && (m.title || m.name) || title,
+              name: m && (m.name || m.title) || title,
+              poster_path: m && (m.poster || m.poster_path),
+              release_date: m && (m.date || m.release_date),
+              first_air_date: m && (m.date || m.first_air_date),
+              overview: m && (m.overview || ""),
+              media_type: m && (m.type || m.media_type || 'movie')
+            };
+            showPreview(previewItem, e.clientX, e.clientY);
+          });
 
-        li.addEventListener("mousemove", (e) => clampPreviewPosition(e.clientX, e.clientY));
-        li.addEventListener("mouseleave", hidePreview);
+          movieTitleEl.addEventListener("mousemove", (e) => clampPreviewPosition(e.clientX, e.clientY));
+          movieTitleEl.addEventListener("mouseleave", hidePreview);
+        }
 
         moviesList.appendChild(li);
       });
@@ -732,6 +739,26 @@ async function loadUserData() {
             Delete
           </button>
         `;
+
+        // attach preview to show title only
+        const showTitleEl = li.querySelector('.item-title');
+        if (showTitleEl) {
+          showTitleEl.addEventListener('mouseenter', (e) => {
+            const previewItem = {
+              title: s && (s.title || s.name) || title,
+              name: s && (s.name || s.title) || title,
+              poster_path: s && (s.poster || s.poster_path) || '',
+              release_date: s && (s.date || s.release_date) || '',
+              first_air_date: s && (s.date || s.first_air_date) || '',
+              overview: s && (s.overview || '') || '',
+              media_type: s && (s.type === 'show' ? 'tv' : s.media_type || 'tv')
+            };
+            showPreview(previewItem, e.clientX, e.clientY);
+          });
+
+          showTitleEl.addEventListener('mousemove', (e) => clampPreviewPosition(e.clientX, e.clientY));
+          showTitleEl.addEventListener('mouseleave', hidePreview);
+        }
 
         showsList.appendChild(li);
       });
