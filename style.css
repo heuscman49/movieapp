@@ -218,8 +218,8 @@ html.theme-warm { --bg:#faf6f0; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fff
   display: none;
   width: min(260px, 30vw);
   max-width: 320px;
-  max-height: 60vh;
-  overflow-y: auto;
+  max-height: min(70vh, 420px);
+  overflow: hidden;
   border-radius: 14px;
   padding: 0;
   z-index: 9999;
@@ -231,7 +231,13 @@ html.theme-warm { --bg:#faf6f0; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fff
   transform: translateY(10px);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
-.preview-card-body { padding: 12px; }
+.preview-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  max-height: min(70vh, 420px);
+  box-sizing: border-box;
+}
 .preview-card-title {
   margin: 0 0 4px;
   font-size: 18px;
@@ -254,9 +260,16 @@ html.theme-warm { --bg:#faf6f0; --text:#2a2420; --muted:#8a7d72; --panel-bg:#fff
   object-fit: cover;
   border: 1px solid var(--border);
 }
+.preview-card-overview-wrap {
+  flex: 1 1 auto;
+  min-height: 48px;
+  max-height: min(32vh, 220px);
+  overflow: hidden;
+  margin-top: 2px;
+}
 .preview-card-overview {
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--text);
 }
 

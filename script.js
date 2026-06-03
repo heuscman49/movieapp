@@ -485,8 +485,10 @@ function showPreview(item, x, y) {
       <div class="preview-card-poster-wrap">
         <img class="preview-card-poster" src="${poster}" alt="">
       </div>
-      <div class="preview-card-overview">
-        ${overview.length > 250 ? overview.slice(0, 250) + "..." : overview}
+      <div class="preview-card-overview-wrap" id="previewOverviewScroll">
+        <div class="preview-card-overview">
+          ${overview}
+        </div>
       </div>
     </div>
   `;
@@ -499,6 +501,15 @@ function showPreview(item, x, y) {
   preview.offsetHeight;
   preview.style.opacity = "1";
   preview.style.transform = "translateY(0px)";
+
+  const posterImg = preview.querySelector(".preview-card-poster");
+  const kickAutoScroll = () => {
+    requestAnimationFrame(() => startPreviewAutoScroll());
+  };
+  kickAutoScroll();
+  if (posterImg && !posterImg.complete) {
+    posterImg.addEventListener("load", kickAutoScroll, { once: true });
+  }
 }
 
 function hidePreview() {
@@ -506,6 +517,7 @@ function hidePreview() {
 
   if (!preview) return;
 
+  stopPreviewAutoScroll();
   preview.style.opacity = "0";
   preview.style.transform = "translateY(10px)";
 
@@ -528,50 +540,64 @@ function clampPreviewPosition(x, y) {
   preview.style.top = Math.min(y + 15, maxY) + "px";
 }
 
-// Auto-scroll preview content when hovered: slowly scroll down and back up
-let __previewAutoScrollTimer = null;
-let __previewAutoScrollDir = 1;
+// Auto-scroll preview description up and down while visible
+let __previewAutoScrollRaf = null;
+let __previewAutoScrollActive = false;
+
+function getPreviewScrollEl() {
+  return document.getElementById("previewOverviewScroll");
+}
+
 function startPreviewAutoScroll() {
-  stopPreviewAutoScroll();
-  const preview = document.getElementById('previewCard');
-  if (!preview) return;
+  stopPreviewAutoScroll(false);
+  const scrollEl = getPreviewScrollEl();
+  if (!scrollEl) return;
 
-  const max = preview.scrollHeight - preview.clientHeight;
-  if (max <= 8) return; // nothing to scroll
+  const max = scrollEl.scrollHeight - scrollEl.clientHeight;
+  if (max <= 4) return;
 
-  __previewAutoScrollDir = 1;
-  let pos = preview.scrollTop || 0;
+  let pos = 0;
+  let dir = 1;
+  let pauseUntil = performance.now() + 800;
+  __previewAutoScrollActive = true;
+  scrollEl.scrollTop = 0;
 
-  __previewAutoScrollTimer = setInterval(() => {
-    // small step for slow smooth scroll
-    pos += __previewAutoScrollDir * 0.4;
+  const tick = (now) => {
+    if (!__previewAutoScrollActive) return;
+
+    if (now < pauseUntil) {
+      __previewAutoScrollRaf = requestAnimationFrame(tick);
+      return;
+    }
+
+    pos += dir * 0.45;
     if (pos >= max) {
       pos = max;
-      __previewAutoScrollDir = -1;
+      dir = -1;
+      pauseUntil = now + 1400;
     } else if (pos <= 0) {
       pos = 0;
-      __previewAutoScrollDir = 1;
+      dir = 1;
+      pauseUntil = now + 1400;
     }
-    preview.scrollTop = pos;
-  }, 20);
+    scrollEl.scrollTop = pos;
+    __previewAutoScrollRaf = requestAnimationFrame(tick);
+  };
+
+  __previewAutoScrollRaf = requestAnimationFrame(tick);
 }
 
-function stopPreviewAutoScroll() {
-  if (__previewAutoScrollTimer) {
-    clearInterval(__previewAutoScrollTimer);
-    __previewAutoScrollTimer = null;
+function stopPreviewAutoScroll(resetScroll = true) {
+  __previewAutoScrollActive = false;
+  if (__previewAutoScrollRaf) {
+    cancelAnimationFrame(__previewAutoScrollRaf);
+    __previewAutoScrollRaf = null;
   }
-  const preview = document.getElementById('previewCard');
-  if (preview) preview.scrollTop = 0;
+  if (resetScroll) {
+    const scrollEl = getPreviewScrollEl();
+    if (scrollEl) scrollEl.scrollTop = 0;
+  }
 }
-
-// attach listeners once (module scope)
-(() => {
-  const p = document.getElementById('previewCard');
-  if (!p) return;
-  p.addEventListener('mouseenter', () => startPreviewAutoScroll());
-  p.addEventListener('mouseleave', () => stopPreviewAutoScroll());
-})();
 
 console.log('script initialized');
 
@@ -1350,13 +1376,8 @@ document.addEventListener("click", (e) => {
 
   if (e.target !== input && !box.contains(e.target)) {
     box.style.display = "none";
-    // hide preview with animation
     if (typeof preview !== 'undefined' && preview) {
-      preview.style.opacity = "0";
-      preview.style.transform = "translateY(10px)";
-      setTimeout(() => {
-        if (preview) preview.style.display = "none";
-      }, 200); // match CSS transition time
+      hidePreview();
     }
   }
 });
