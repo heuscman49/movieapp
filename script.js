@@ -959,10 +959,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // toggle behavior: clicking again closes
   if (openReviewsBtn) openReviewsBtn.onclick = () => {
     const rp = document.getElementById('reviewsPage');
+    const sp = document.getElementById('settingsPage');
+    if (sp) sp.style.display = 'none';
     if (!rp) return; rp.style.display = rp.style.display === 'block' ? 'none' : 'block'; if (rp.style.display === 'block') renderAllReviews();
   };
   if (openSettingsBtn) openSettingsBtn.onclick = () => {
+    const rp = document.getElementById('reviewsPage');
     const sp = document.getElementById('settingsPage');
+    if (rp) rp.style.display = 'none';
     if (!sp) return; sp.style.display = sp.style.display === 'block' ? 'none' : 'block';
   };
   if (reviewsSort) reviewsSort.onchange = () => renderAllReviews();
@@ -1013,11 +1017,19 @@ function applyTheme(name) {
     const userRef = doc(db, 'users', currentUser.uid);
     updateDoc(userRef, { theme: name }).catch(() => {});
   }
+  markActiveThemeTile(name);
 }
 
 function loadStoredTheme() {
   const t = localStorage.getItem('movieapp-theme');
   if (t) applyTheme(t);
+  else applyTheme('default');
+}
+
+function markActiveThemeTile(name) {
+  document.querySelectorAll('.theme-tile').forEach(tile => {
+    tile.classList.toggle('active', tile.getAttribute('data-theme') === name);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

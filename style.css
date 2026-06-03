@@ -1,5 +1,5 @@
 /* Global layout */
-body { margin: 0; font-family: system-ui, Arial, sans-serif; }
+body { margin: 0; font-family: system-ui, Arial, sans-serif; background:var(--bg); color:var(--text); }
 
 /* CSS variables for theming */
 :root {
@@ -29,7 +29,7 @@ body.theme-default { --bg:#ffffff; --text:#111111; --muted:#777777; --panel-bg:#
 body.theme-dark-mode { --bg:#0e0e0e; --text:#f2f2f2; --muted:#9a9a9a; --panel-bg:#151515; --border:#222; --accent:#4a90e2; --accent-text:#fff; --preview-bg: rgba(12,12,12,0.95); }
 
 /* Left login pane */
-#leftPane { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; padding: 20px; background: #f0f0f0; box-shadow: 2px 0 6px rgba(0,0,0,0.05); }
+#leftPane { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; padding: 20px; background: var(--panel-bg); box-shadow: 2px 0 6px rgba(0,0,0,0.05); color:var(--text); border-right:1px solid var(--border); }
 
 /* Make room for the side icons on the left */
 #appSection { margin-left: 100px; }
@@ -53,20 +53,20 @@ body.theme-dark-mode { --bg:#0e0e0e; --text:#f2f2f2; --muted:#9a9a9a; --panel-bg
 
 /* Result item */
 .result-item { padding:8px; cursor:pointer; border-bottom:1px solid var(--border); }
-.result-item:hover { background:var(--panel-bg); }
+.result-item:hover { background:rgba(0,0,0,0.03); }
 
 /* Preview card */
 #previewCard { position: fixed; width: min(260px, 30vw); max-width: 320px; max-height: 60vh; overflow-y: auto; border-radius: 14px; background: var(--preview-bg); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity:0; transform: translateY(10px); transition: opacity 0.2s ease, transform 0.2s ease; color:var(--text); }
 #previewCard img { width:80px; height:auto; border-radius:8px; object-fit:cover; }
 
 /* Recent activity panel (top right) */
-#ratingsPanel { font-family: system-ui, Arial, sans-serif; }
+#ratingsPanel { font-family: system-ui, Arial, sans-serif; background:var(--panel-bg); border:1px solid var(--border); color:var(--text); }
 #ratingsList li { padding:8px 0; border-bottom:1px solid #f0f0f0; }
 #ratingsList li:last-child { border-bottom: none; }
 
 /* star rating visuals */
 .star { cursor: pointer; color: #ddd; font-size:18px; margin-right:2px; }
-.star.selected { color: #f5b301; }
+.star.selected { color: var(--accent); }
 .stars { display:inline-block; margin-right:8px; }
 
 /* Watched list spacing and layout */
@@ -75,6 +75,14 @@ body.theme-dark-mode { --bg:#0e0e0e; --text:#f2f2f2; --muted:#9a9a9a; --panel-bg
 .watched-title { margin-bottom:6px; color:var(--text); }
 .watched-rating-row { margin-bottom:8px; }
 .watched-controls { display:flex; flex-direction:column; gap:8px; align-items:stretch; max-width:420px; box-sizing:border-box; }
-.watched-review-input { width:100%; max-width:420px; min-height:56px; padding:8px; resize:vertical; box-sizing:border-box; }
+.watched-review-input { width:100%; max-width:420px; min-height:56px; padding:8px; resize:vertical; box-sizing:border-box; background:var(--panel-bg); color:var(--text); border:1px solid var(--border); }
 .watched-control-row { display:flex; justify-content:flex-end; }
 .review-submitted { display:inline-block; background:#e6ffed; color:#0a7a2a; padding:6px 8px; border-radius:6px; font-weight:600; }
+
+/* Theme tiles */
+.theme-tile { padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--panel-bg); cursor:pointer; user-select:none; }
+.theme-tile:hover { box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+.theme-tile.active { outline:2px solid var(--accent); }
+
+/* Inputs/buttons theming */
+button, input, select, textarea { color:var(--text); background:var(--panel-bg); border:1px solid var(--border); }
