@@ -777,10 +777,15 @@ html.theme-meiko #previewCard {
   html.theme-hatsune::before {
     background-size: 150% auto;
     background-position: right center;
+    position: absolute;
   }
   html.theme-meiko::before {
     background-size: 150% auto;
     background-position: right center;
+    position: absolute;
+  }
+  html.theme-meiko {
+    background-attachment: scroll;
   }
 }
 
