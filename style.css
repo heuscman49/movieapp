@@ -1,103 +1,53 @@
-/* Blue left sidebar implemented via pseudo-element so it appears on every page */
-/* No custom styles currently */
-body {
-  margin: 0;
-}
-
-/* shift main content slightly left to make room for side icons */
-main, .content, #appSection { margin-left: 220px; }
-
-#sideIcons button { background:#fff; border:1px solid #eee; cursor:pointer; }
-
-#reviewsPage, #settingsPage { position:fixed; left:80px; top:80px; right:80px; bottom:80px; background:#fff; border:1px solid #ddd; padding:16px; overflow:auto; border-radius:8px; z-index:1200; }
-
-#allReviewsList li { padding:8px 0; border-bottom:1px solid #f0f0f0; }
+/* Global layout */
+body { margin: 0; font-family: system-ui, Arial, sans-serif; }
 
 /* Left login pane */
-#leftPane {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 240px;
-  padding: 20px;
-  background: #f0f0f0;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.05);
-}
+#leftPane { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; padding: 20px; background: #f0f0f0; box-shadow: 2px 0 6px rgba(0,0,0,0.05); }
 
-main, .content {
-  margin-left: 260px; /* leave space for left pane */
-}
+/* Make room for the side icons on the left */
+#appSection { margin-left: 100px; }
 
-.result-item {
-  padding: 8px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-}
+/* side icons panel */
+.side-icons { position: fixed; left: 12px; top: 120px; z-index: 1100; display:flex; flex-direction:column; gap:12px; }
+.side-item { position: relative; display:flex; align-items:center; }
+.side-btn { width:44px; height:44px; border-radius:8px; background:#fff; border:1px solid #eee; cursor:pointer; }
+.side-label { position:absolute; left:54px; white-space:nowrap; background:#fff; border:1px solid #eee; padding:6px 10px; border-radius:8px; margin-left:8px; transform: translateX(-8px); opacity:0; transition: transform 220ms ease, opacity 220ms ease; pointer-events:none; }
+.side-item.expanded .side-label { transform: translateX(0); opacity:1; }
 
-.result-item:hover {
-  background: #f2f2f2;
-}
+/* make the label area slide out (container width increases smoothly) */
+.side-icons { transition: width 220ms ease; }
 
-#previewCard {
-  position: fixed;
+/* Reviews/settings overlays */
+#reviewsPage, #settingsPage { position:fixed; left:80px; top:80px; right:80px; bottom:80px; background:#fff; border:1px solid #ddd; padding:16px; overflow:auto; border-radius:8px; z-index:1200; }
 
-  width: min(260px, 30vw);
-  max-width: 320px;
+/* all reviews layout: responsive grid */
+#allReviewsList { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px; list-style:none; padding:0; margin:0; }
+#allReviewsList li { padding:12px; border:1px solid #f0f0f0; border-radius:8px; background:#fff; }
 
-  max-height: 60vh;
+/* Result item */
+.result-item { padding:8px; cursor:pointer; border-bottom:1px solid #eee; }
+.result-item:hover { background:#f2f2f2; }
 
-  overflow-y: auto;
+/* Preview card */
+#previewCard { position: fixed; width: min(260px, 30vw); max-width: 320px; max-height: 60vh; overflow-y: auto; border-radius: 14px; background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity:0; transform: translateY(10px); transition: opacity 0.2s ease, transform 0.2s ease; }
+#previewCard img { width:80px; height:auto; border-radius:8px; object-fit:cover; }
 
-  border-radius: 14px;
-  overflow: hidden;
-
-  background: rgba(20, 20, 20, 0.95);
-  backdrop-filter: blur(10px);
-
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-#previewCard img {
-  width: 80px;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-/* Ratings panel on top-right */
-#ratingsPanel {
-  font-family: system-ui, Arial, sans-serif;
-}
-
-#ratingsList li {
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
+/* Recent activity panel (top right) */
+#ratingsPanel { font-family: system-ui, Arial, sans-serif; }
+#ratingsList li { padding:8px 0; border-bottom:1px solid #f0f0f0; }
 #ratingsList li:last-child { border-bottom: none; }
 
 /* star rating visuals */
-.star {
-  cursor: pointer;
-  color: #ddd;
-  font-size: 18px;
-  margin-right: 2px;
-}
+.star { cursor: pointer; color: #ddd; font-size:18px; margin-right:2px; }
 .star.selected { color: #f5b301; }
-.stars { display: inline-block; margin-right: 8px; }
+.stars { display:inline-block; margin-right:8px; }
 
 /* Watched list spacing and layout */
 #watchedList li { padding: 12px 0; }
-.watched-item { display:block; }
+.watched-item { display:block; max-width:420px; box-sizing:border-box; }
 .watched-title { margin-bottom:6px; }
 .watched-rating-row { margin-bottom:8px; }
 .watched-controls { display:flex; flex-direction:column; gap:8px; align-items:stretch; max-width:420px; box-sizing:border-box; }
-.watched-item { max-width:420px; box-sizing:border-box; }
 .watched-review-input { width:100%; max-width:420px; min-height:56px; padding:8px; resize:vertical; box-sizing:border-box; }
 .watched-control-row { display:flex; justify-content:flex-end; }
 .review-submitted { display:inline-block; background:#e6ffed; color:#0a7a2a; padding:6px 8px; border-radius:6px; font-weight:600; }

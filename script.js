@@ -951,15 +951,34 @@ window.openReview = openReview;
 document.addEventListener('DOMContentLoaded', () => {
   const openReviewsBtn = document.getElementById('openReviewsBtn');
   const openSettingsBtn = document.getElementById('openSettingsBtn');
-  const reviewsBackBtn = document.getElementById('reviewsBackBtn');
-  const settingsBackBtn = document.getElementById('settingsBackBtn');
   const reviewsSort = document.getElementById('reviewsSort');
 
   if (openReviewsBtn) openReviewsBtn.onclick = () => showReviewsPage();
   if (openSettingsBtn) openSettingsBtn.onclick = () => showSettingsPage();
-  if (reviewsBackBtn) reviewsBackBtn.onclick = () => hideOverlayPages();
-  if (settingsBackBtn) settingsBackBtn.onclick = () => hideOverlayPages();
+  // toggle behavior: clicking again closes
+  if (openReviewsBtn) openReviewsBtn.onclick = () => {
+    const rp = document.getElementById('reviewsPage');
+    if (!rp) return; rp.style.display = rp.style.display === 'block' ? 'none' : 'block'; if (rp.style.display === 'block') renderAllReviews();
+  };
+  if (openSettingsBtn) openSettingsBtn.onclick = () => {
+    const sp = document.getElementById('settingsPage');
+    if (!sp) return; sp.style.display = sp.style.display === 'block' ? 'none' : 'block';
+  };
   if (reviewsSort) reviewsSort.onchange = () => renderAllReviews();
+
+  // expand labels on hover after 500ms
+  document.querySelectorAll('.side-item').forEach(item => {
+    let hoverTimer = null;
+    item.addEventListener('mouseenter', () => {
+      hoverTimer = setTimeout(() => {
+        item.classList.add('expanded');
+      }, 500);
+    });
+    item.addEventListener('mouseleave', () => {
+      if (hoverTimer) clearTimeout(hoverTimer);
+      item.classList.remove('expanded');
+    });
+  });
 });
 
 function hideOverlayPages() {
@@ -986,28 +1005,38 @@ async function renderAllReviews() {
   if (!currentUser) return;
   const snap = await getDoc(doc(db, 'users', currentUser.uid));
   const data = snap.data() || {};
-  const watched = Array.isArray(data.watched) ? data.watched.filter(w => w.rating) : [];
+  const watched = Array.isArray(data.watched) ? data.watched : [];
 
   const sortEl = document.getElementById('reviewsSort');
   const sort = sortEl ? sortEl.value : 'newest';
 
-  if (sort === 'rating') {
-    watched.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  } else if (sort === 'oldest') {
-    // assume watched order is addition order; reverse for newest by default
-    watched.sort((a, b) => 0); // keep original
-  } else {
-    // newest: reverse original array
-    watched.reverse();
-  }
+  let items = watched.filter(w => w.rating);
+  if (sort === 'rating') items.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  else if (sort === 'oldest') items = items.slice().reverse().reverse(); // keep as-is for oldest
+  else items = items.slice().reverse(); // newest first
 
   const list = document.getElementById('allReviewsList');
   if (!list) return;
   list.innerHTML = '';
 
-  watched.forEach((w, i) => {
+  items.forEach((w, i) => {
     const li = document.createElement('li');
     li.innerHTML = `<strong>${w.title}</strong><br>⭐ ${w.rating} — ${w.review || ''}`;
+    list.appendChild(li);
+  });
+}
+
+// render recent activity instead of static ratings
+async function loadRecentActivity() {
+  if (!currentUser) return;
+  const snap = await getDoc(doc(db, 'users', currentUser.uid));
+  const data = snap.data() || {};
+  const recent = (data.activity || []).slice().reverse().slice(0, 20);
+  const list = document.getElementById('ratingsList');
+  if (!list) return; list.innerHTML = '';
+  recent.forEach(a => {
+    const li = document.createElement('li');
+    li.textContent = a;
     list.appendChild(li);
   });
 }
