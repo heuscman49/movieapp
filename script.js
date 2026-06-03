@@ -172,13 +172,15 @@ function showPreview(item, x, y) {
       ${overview.slice(0, 120)}...
     </p>
   `;
-
-  preview.style.display = "block";
-  preview.style.opacity = "1";
-  preview.style.transform = "translateY(0px)";
-
+  // position first, then show and trigger transition
   preview.style.left = x + 15 + "px";
   preview.style.top = y + 15 + "px";
+
+  preview.style.display = "block";
+  // force reflow so the CSS transition will animate
+  preview.offsetHeight;
+  preview.style.opacity = "1";
+  preview.style.transform = "translateY(0px)";
 }
 
 function hidePreview() {
@@ -192,6 +194,20 @@ function hidePreview() {
   setTimeout(() => {
     if (preview) preview.style.display = "none";
   }, 200);
+}
+
+function clampPreviewPosition(x, y) {
+  const preview = document.getElementById("previewCard");
+
+  if (!preview) return;
+
+  const padding = 10;
+
+  const maxX = window.innerWidth - preview.offsetWidth - padding;
+  const maxY = window.innerHeight - preview.offsetHeight - padding;
+
+  preview.style.left = Math.min(x + 15, maxX) + "px";
+  preview.style.top = Math.min(y + 15, maxY) + "px";
 }
 
 console.log('script initialized');
@@ -690,9 +706,7 @@ document.getElementById("searchInput").addEventListener("input", async (e) => {
     });
 
     div.addEventListener("mousemove", (e) => {
-      const preview = document.getElementById("previewCard");
-      preview.style.left = e.clientX + 15 + "px";
-      preview.style.top = e.clientY + 15 + "px";
+      clampPreviewPosition(e.clientX, e.clientY);
     });
 
     div.addEventListener("mouseleave", hidePreview);

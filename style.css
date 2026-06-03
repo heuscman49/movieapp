@@ -31,13 +31,31 @@ main, .content {
 }
 
 #previewCard {
+  position: fixed;
+
+  width: min(260px, 30vw);
+  max-width: 320px;
+
+  max-height: 60vh;
+
+  overflow-y: auto;
+
+  border-radius: 14px;
+  overflow: hidden;
+
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(10px);
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.2s ease, transform 0.2s ease;
-  border-radius: 14px;
-  overflow: hidden;
 }
 
 #previewCard img {
+  width: 100%;
+  height: auto;
   border-radius: 10px;
+  object-fit: cover;
 }
