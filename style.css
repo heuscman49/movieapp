@@ -81,3 +81,11 @@ main, .content {
 }
 .star.selected { color: #f5b301; }
 .stars { display: inline-block; margin-right: 8px; }
+
+/* Watched list spacing and layout */
+#watchedList li { padding: 12px 0; }
+.watched-item { display:block; }
+.watched-title { margin-bottom:6px; }
+.watched-rating-row { margin-bottom:8px; }
+.watched-controls { display:flex; gap:8px; align-items:center; }
+.watched-review-input { flex:1; padding:6px; }

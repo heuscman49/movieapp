@@ -201,12 +201,19 @@ async function loadWatched() {
     }
 
     li.innerHTML = `
-      ⭐ ${w.title}
+      <div class="watched-item">
+        <div class="watched-title"><strong>${w.title}</strong></div>
 
-      <div class="stars" id="stars-${i}">${starsHtml}</div>
-      <input id="rating-input-${i}" type="hidden" value="${w.rating || ''}">
-      <input id="review-input-${i}" type="text" placeholder="Review" value="${(w.review||'').replace(/"/g, '&quot;')}" onchange="setReview(${i}, this.value)">
-      <button onclick="submitRating(${i})">Submit</button>
+        <div class="watched-rating-row">
+          <div class="stars" id="stars-${i}">${starsHtml}</div>
+        </div>
+
+        <div class="watched-controls">
+          <input id="rating-input-${i}" type="hidden" value="${w.rating || ''}">
+          <input id="review-input-${i}" type="text" class="watched-review-input" placeholder="Review" value="${(w.review||'').replace(/"/g, '&quot;')}" onchange="setReview(${i}, this.value)">
+          <button onclick="submitRating(${i})">Submit</button>
+        </div>
+      </div>
     `;
 
     // preview handlers for watched items
@@ -278,7 +285,7 @@ window.submitRating = async (index) => {
   if (typeof loadRatings === 'function') loadRatings();
 };
 
-// populate the top-right ratings panel with reviewed items
+// populate the top-right ratings panel with reviewed items (with edit/delete)
 async function loadRatings() {
   if (!currentUser) return;
   const snap = await getDoc(doc(db, "users", currentUser.uid));
@@ -290,12 +297,107 @@ async function loadRatings() {
 
   const watched = Array.isArray(data.watched) ? data.watched : [];
 
-  watched.filter(w => w.rating).forEach((w, i) => {
+  watched.forEach((w, i) => {
+    if (!w || !w.rating) return; // only show items with ratings
+
     const li = document.createElement('li');
-    li.innerHTML = `<strong>${w.title}</strong><br>⭐ ${w.rating} — ${w.review || ''}`;
+    li.id = `rating-item-${i}`;
+    li.innerHTML = `
+      <strong>${w.title}</strong><br>
+      ⭐ ${w.rating} — ${w.review || ''}
+      <div style="margin-top:6px;">
+        <button onclick="editReview(${i})">Edit</button>
+        <button onclick="deleteReview(${i})">Delete</button>
+      </div>
+    `;
+
     list.appendChild(li);
   });
 }
+
+// delete a review (clears rating and review for the watched item)
+window.deleteReview = async (index) => {
+  if (!currentUser) return alert('Not signed in');
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return console.error('User doc missing');
+  const data = snap.data() || {};
+  const watched = Array.isArray(data.watched) ? data.watched.slice() : [];
+  if (index < 0 || index >= watched.length) return console.error('Index OOB');
+
+  watched[index] = { ...watched[index], rating: null, review: "" };
+  await updateDoc(userRef, { watched });
+
+  if (typeof loadRatings === 'function') loadRatings();
+  if (typeof loadWatched === 'function') loadWatched();
+};
+
+// open inline editor for a review in the ratings panel
+window.editReview = async (index) => {
+  if (!currentUser) return;
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return;
+  const data = snap.data() || {};
+  const watched = Array.isArray(data.watched) ? data.watched : [];
+  const item = watched[index] || {};
+
+  const li = document.getElementById(`rating-item-${index}`);
+  if (!li) return;
+
+  const currentRating = item.rating || 0;
+  const currentReview = item.review || '';
+
+  // build star editor
+  let starsHtml = '';
+  for (let s = 1; s <= 5; s++) {
+    const filled = s <= currentRating ? 'selected' : '';
+    starsHtml += `<span class="star ${filled}" data-value="${s}" onclick="selectEditStar(${index}, ${s})">★</span>`;
+  }
+
+  li.innerHTML = `
+    <strong>${item.title}</strong>
+    <div class="stars" id="stars-edit-${index}">${starsHtml}</div>
+    <input id="edit-rating-input-${index}" type="hidden" value="${currentRating}">
+    <textarea id="edit-review-input-${index}" rows="3">${(currentReview||'').replace(/</g,'&lt;')}</textarea>
+    <div style="margin-top:6px;"><button onclick="saveEditedReview(${index})">Save</button> <button onclick="loadRatings()">Cancel</button></div>
+  `;
+};
+
+// helper for star clicks inside the edit UI
+window.selectEditStar = (index, value) => {
+  const starsEl = document.getElementById(`stars-edit-${index}`);
+  if (!starsEl) return;
+  const input = document.getElementById(`edit-rating-input-${index}`);
+  if (input) input.value = value;
+
+  Array.from(starsEl.querySelectorAll('.star')).forEach(span => {
+    const v = Number(span.getAttribute('data-value'));
+    if (v <= value) span.classList.add('selected'); else span.classList.remove('selected');
+  });
+};
+
+// save edited review back to Firestore
+window.saveEditedReview = async (index) => {
+  if (!currentUser) return alert('Not signed in');
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return console.error('User doc missing');
+  const data = snap.data() || {};
+  const watched = Array.isArray(data.watched) ? data.watched.slice() : [];
+  if (index < 0 || index >= watched.length) return console.error('Index OOB');
+
+  const ratingEl = document.getElementById(`edit-rating-input-${index}`);
+  const reviewEl = document.getElementById(`edit-review-input-${index}`);
+  const rating = ratingEl ? Number(ratingEl.value) || null : null;
+  const review = reviewEl ? reviewEl.value || '' : '';
+
+  watched[index] = { ...watched[index], rating, review };
+  await updateDoc(userRef, { watched });
+
+  if (typeof loadRatings === 'function') loadRatings();
+  if (typeof loadWatched === 'function') loadWatched();
+};
 
 
 function checkAdmin(user) {
