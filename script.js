@@ -555,6 +555,51 @@ function clampPreviewPosition(x, y) {
   preview.style.top = Math.min(y + 15, maxY) + "px";
 }
 
+// Auto-scroll preview content when hovered: slowly scroll down and back up
+let __previewAutoScrollTimer = null;
+let __previewAutoScrollDir = 1;
+function startPreviewAutoScroll() {
+  stopPreviewAutoScroll();
+  const preview = document.getElementById('previewCard');
+  if (!preview) return;
+
+  const max = preview.scrollHeight - preview.clientHeight;
+  if (max <= 8) return; // nothing to scroll
+
+  __previewAutoScrollDir = 1;
+  let pos = preview.scrollTop || 0;
+
+  __previewAutoScrollTimer = setInterval(() => {
+    // small step for slow smooth scroll
+    pos += __previewAutoScrollDir * 0.4;
+    if (pos >= max) {
+      pos = max;
+      __previewAutoScrollDir = -1;
+    } else if (pos <= 0) {
+      pos = 0;
+      __previewAutoScrollDir = 1;
+    }
+    preview.scrollTop = pos;
+  }, 20);
+}
+
+function stopPreviewAutoScroll() {
+  if (__previewAutoScrollTimer) {
+    clearInterval(__previewAutoScrollTimer);
+    __previewAutoScrollTimer = null;
+  }
+  const preview = document.getElementById('previewCard');
+  if (preview) preview.scrollTop = 0;
+}
+
+// attach listeners once (module scope)
+(() => {
+  const p = document.getElementById('previewCard');
+  if (!p) return;
+  p.addEventListener('mouseenter', () => startPreviewAutoScroll());
+  p.addEventListener('mouseleave', () => stopPreviewAutoScroll());
+})();
+
 console.log('script initialized');
 
 let selectedItem = null;
@@ -901,6 +946,71 @@ if (setUsernameBtn) {
 // Expose addMedia and openReview globally for onclick handlers
 window.addMedia = addMedia;
 window.openReview = openReview;
+
+// Reviews/Settings panel handling
+document.addEventListener('DOMContentLoaded', () => {
+  const openReviewsBtn = document.getElementById('openReviewsBtn');
+  const openSettingsBtn = document.getElementById('openSettingsBtn');
+  const reviewsBackBtn = document.getElementById('reviewsBackBtn');
+  const settingsBackBtn = document.getElementById('settingsBackBtn');
+  const reviewsSort = document.getElementById('reviewsSort');
+
+  if (openReviewsBtn) openReviewsBtn.onclick = () => showReviewsPage();
+  if (openSettingsBtn) openSettingsBtn.onclick = () => showSettingsPage();
+  if (reviewsBackBtn) reviewsBackBtn.onclick = () => hideOverlayPages();
+  if (settingsBackBtn) settingsBackBtn.onclick = () => hideOverlayPages();
+  if (reviewsSort) reviewsSort.onchange = () => renderAllReviews();
+});
+
+function hideOverlayPages() {
+  const rp = document.getElementById('reviewsPage');
+  const sp = document.getElementById('settingsPage');
+  if (rp) rp.style.display = 'none';
+  if (sp) sp.style.display = 'none';
+}
+
+function showReviewsPage() {
+  const rp = document.getElementById('reviewsPage');
+  if (!rp) return;
+  rp.style.display = 'block';
+  renderAllReviews();
+}
+
+function showSettingsPage() {
+  const sp = document.getElementById('settingsPage');
+  if (!sp) return;
+  sp.style.display = 'block';
+}
+
+async function renderAllReviews() {
+  if (!currentUser) return;
+  const snap = await getDoc(doc(db, 'users', currentUser.uid));
+  const data = snap.data() || {};
+  const watched = Array.isArray(data.watched) ? data.watched.filter(w => w.rating) : [];
+
+  const sortEl = document.getElementById('reviewsSort');
+  const sort = sortEl ? sortEl.value : 'newest';
+
+  if (sort === 'rating') {
+    watched.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sort === 'oldest') {
+    // assume watched order is addition order; reverse for newest by default
+    watched.sort((a, b) => 0); // keep original
+  } else {
+    // newest: reverse original array
+    watched.reverse();
+  }
+
+  const list = document.getElementById('allReviewsList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  watched.forEach((w, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${w.title}</strong><br>⭐ ${w.rating} — ${w.review || ''}`;
+    list.appendChild(li);
+  });
+}
 
 const filterEl = document.getElementById("filterType");
 if (filterEl) filterEl.onchange = () => { if (typeof loadWatched === 'function') loadWatched(); };

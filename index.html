@@ -60,6 +60,12 @@
       <ul id="ratingsList" style="list-style:none; padding:0; margin:0;"></ul>
     </div>
 
+    <!-- floating side icons panel -->
+    <div id="sideIcons" style="position:fixed; left:20px; top:120px; z-index:1100; display:flex; flex-direction:column; gap:12px;">
+      <button id="openReviewsBtn" title="My Reviews" style="width:44px; height:44px; border-radius:8px;">📝</button>
+      <button id="openSettingsBtn" title="Settings" style="width:44px; height:44px; border-radius:8px;">⚙️</button>
+    </div>
+
     <input id="searchInput" placeholder="Search movies or shows" autocomplete="off">
 
     <div id="searchDropdown" style="
@@ -80,6 +86,25 @@
         display: none;
       "></div>
 
+    </div>
+
+    <!-- Reviews page (hidden by default) -->
+    <div id="reviewsPage" style="display:none; padding:12px;">
+      <button id="reviewsBackBtn">← Back</button>
+      <h2>All Reviews</h2>
+      <label>Sort: <select id="reviewsSort">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="rating">Highest rating</option>
+      </select></label>
+      <ul id="allReviewsList" style="list-style:none; padding:0; margin-top:12px;"></ul>
+    </div>
+
+    <!-- Settings page (empty for now) -->
+    <div id="settingsPage" style="display:none; padding:12px;">
+      <button id="settingsBackBtn">← Back</button>
+      <h2>Settings</h2>
+      <div>Coming soon</div>
     </div>
 
     <h2>Movies to watch:</h2>

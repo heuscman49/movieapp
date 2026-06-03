@@ -4,6 +4,15 @@ body {
   margin: 0;
 }
 
+/* shift main content slightly left to make room for side icons */
+main, .content, #appSection { margin-left: 220px; }
+
+#sideIcons button { background:#fff; border:1px solid #eee; cursor:pointer; }
+
+#reviewsPage, #settingsPage { position:fixed; left:80px; top:80px; right:80px; bottom:80px; background:#fff; border:1px solid #ddd; padding:16px; overflow:auto; border-radius:8px; z-index:1200; }
+
+#allReviewsList li { padding:8px 0; border-bottom:1px solid #f0f0f0; }
+
 /* Left login pane */
 #leftPane {
   position: fixed;
