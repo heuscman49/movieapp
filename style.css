@@ -77,10 +77,10 @@ html.theme-hatsune::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('miku2.png'), linear-gradient(to bottom, #006e70, #0a1a20);
-  background-repeat: no-repeat, no-repeat;
-  background-position: right 10% center, center center;
-  background-size: contain, cover;
+  background-image: url('miku2.png');
+  background-repeat: no-repeat;
+  background-position: right 10% center;
+  background-size: contain;
   opacity: 0.4;
   pointer-events: none;
   z-index: -1;
@@ -779,7 +779,7 @@ html.theme-meiko #previewCard {
   /* Oversized background images on mobile for scroll reveal */
   html.theme-hatsune::before {
     background-size: contain;
-    background-position: center center;
+    background-position: right -10% center;
     position: absolute;
   }
   html.theme-meiko::before {
