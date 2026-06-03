@@ -451,7 +451,6 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const authSection = document.getElementById("authSection");
 const appSection = document.getElementById("appSection");
-const logoutBtn = document.getElementById("logoutBtn");
 
 const usernameSection = document.getElementById('usernameSection');
 const usernameInput = document.getElementById('usernameInput');
@@ -909,11 +908,33 @@ document.getElementById("loginBtn").onclick = () => {
 
 
 // Logout
-if (logoutBtn) {
-  logoutBtn.onclick = () => {
+// menu for logout / change username
+const moreBtn = document.getElementById('moreBtn');
+const moreMenu = document.getElementById('moreMenu');
+const menuLogout = document.getElementById('menuLogout');
+const menuChangeUsername = document.getElementById('menuChangeUsername');
+
+if (moreBtn && moreMenu) {
+  moreBtn.onclick = () => {
+    const shown = moreMenu.style.display === 'block';
+    moreMenu.style.display = shown ? 'none' : 'block';
+    if (!shown) moreMenu.classList.add('fade-in'); else moreMenu.classList.remove('fade-in');
+  };
+}
+
+if (menuLogout) {
+  menuLogout.onclick = () => {
     signOut(auth)
       .then(() => alert('Logged out'))
       .catch(err => alert(err.message));
+  };
+}
+
+if (menuChangeUsername) {
+  menuChangeUsername.onclick = () => {
+    if (usernameSection) usernameSection.style.display = 'block';
+    if (appSection) appSection.style.display = 'none';
+    if (moreMenu) moreMenu.style.display = 'none';
   };
 }
 
@@ -1018,6 +1039,13 @@ function applyTheme(name) {
     updateDoc(userRef, { theme: name }).catch(() => {});
   }
   markActiveThemeTile(name);
+  // visual feedback on side buttons
+  document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.side-item[data-action="reviews"] .side-btn`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    setTimeout(() => activeBtn.classList.remove('active'), 220);
+  }
 }
 
 function loadStoredTheme() {
@@ -1074,12 +1102,14 @@ async function loadRecentActivity() {
   if (!currentUser) return;
   const snap = await getDoc(doc(db, 'users', currentUser.uid));
   const data = snap.data() || {};
-  const recent = (data.activity || []).slice().reverse().slice(0, 20);
+  // show only items with rating (my reviews style)
+  const watched = Array.isArray(data.watched) ? data.watched.filter(w => w.rating) : [];
   const list = document.getElementById('ratingsList');
   if (!list) return; list.innerHTML = '';
-  recent.forEach(a => {
+  // newest first
+  watched.slice().reverse().forEach(w => {
     const li = document.createElement('li');
-    li.textContent = a;
+    li.innerHTML = `<strong>${w.title}</strong><br>⭐ ${w.rating} — ${w.review || ''}`;
     list.appendChild(li);
   });
 }

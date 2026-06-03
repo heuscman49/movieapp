@@ -53,11 +53,18 @@
 
   <!-- APP SECTION -->
   <div id="appSection" style="display:none;">
-    <h1 id="welcomeHeader">Welcome <span id="usernameDisplay"></span> <button id="logoutBtn" style="margin-left:16px;">Logout</button></h1>
+    <h1 id="welcomeHeader">Welcome <span id="usernameDisplay"></span>
+      <button id="moreBtn" aria-haspopup="true" aria-expanded="false" style="margin-left:12px; border:none; background:transparent; font-size:20px; cursor:pointer;">⋯</button>
 
-    <div id="ratingsPanel" style="display:block; position:fixed; top:20px; right:20px; width:320px; max-height:60vh; overflow:auto; background:#fff; border:1px solid #ddd; padding:12px; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.08); z-index:1000;">
+      <div id="moreMenu" style="display:none; position:absolute; margin-top:8px; right:20px; background:var(--panel-bg); border:1px solid var(--border); padding:8px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.12); z-index:1500;">
+        <div id="menuChangeUsername" style="padding:6px 10px; cursor:pointer;">Change username</div>
+        <div id="menuLogout" style="padding:6px 10px; cursor:pointer;">Logout</div>
+      </div>
+    </h1>
+
+    <div id="ratingsPanel">
       <h3 style="margin:0 0 8px 0;">Recent Activity</h3>
-      <ul id="ratingsList" style="list-style:none; padding:0; margin:0;"></ul>
+      <ul id="ratingsList"></ul>
     </div>
 
     <!-- floating side icons panel -->
@@ -109,10 +116,14 @@
     <div id="settingsPage" style="display:none; padding:12px;">
       <h2>Settings</h2>
       <h3>Themes</h3>
-      <div id="themesGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px;">
+      <div id="themesGrid" style="display:flex; flex-direction:column; gap:8px;">
         <div class="theme-tile" data-theme="hacker">Hacker</div>
         <div class="theme-tile" data-theme="cute">Cute</div>
         <div class="theme-tile" data-theme="nether">Nether</div>
+        <div class="theme-tile" data-theme="cyberpunk">Cyberpunk</div>
+        <div class="theme-tile" data-theme="midnight">Midnight</div>
+        <div class="theme-tile" data-theme="ocean">Ocean</div>
+        <div class="theme-tile" data-theme="forest">Forest</div>
         <div class="theme-tile" data-theme="default">Default</div>
         <div class="theme-tile" data-theme="dark-mode">Dark Mode</div>
       </div>
