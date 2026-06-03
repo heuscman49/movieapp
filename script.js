@@ -935,14 +935,53 @@ async function showUserData(uid) {
 
     <p style="color:var(--text);"><b>Email:</b> ${data.email}</p>
 
-    <h4 style="color:var(--text);">🎬 Movies</h4>
-    <ul style="color:var(--text); padding-left:1.25rem;">
-      ${(data.movies || []).map(item => `<li>${(item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item}</li>`).join("")}
-    </ul>
+    <h4 style="color:var(--text);">🎬 Movies to Watch (${(data.movies || []).length})</h4>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
+      ${(data.movies || []).map(item => {
+        const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
+        const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
+        return `
+          <div style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center;">
+            ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
+            <div style="color:var(--text); font-size:12px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
 
-    <h4 style="color:var(--text);">📺 Shows</h4>
-    <ul style="color:var(--text); padding-left:1.25rem;">
-      ${(data.shows || []).map(item => `<li>${(item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item}</li>`).join("")}
+    <h4 style="color:var(--text);">📺 Shows to Watch (${(data.shows || []).length})</h4>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
+      ${(data.shows || []).map(item => {
+        const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
+        const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
+        return `
+          <div style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center;">
+            ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
+            <div style="color:var(--text); font-size:12px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <h4 style="color:var(--text);">✅ Watched (${(data.watched || []).length})</h4>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
+      ${(data.watched || []).map(item => {
+        const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
+        const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
+        const rating = (item && typeof item === 'object') ? (item.rating ? `⭐ ${item.rating}` : '') : '';
+        return `
+          <div style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center;">
+            ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
+            <div style="color:var(--text); font-size:12px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
+            ${rating ? `<div style="color:var(--accent); font-size:11px;">${rating}</div>` : ''}
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <h4 style="color:var(--text);">📝 Reviews (${(data.reviews || []).length})</h4>
+    <ul style="color:var(--text); padding-left:1.25rem; max-height:150px; overflow-y:auto;">
+      ${(data.reviews || []).map(item => `<li><b>${item.title || 'Unknown'}</b> - ${item.rating}/5 stars: ${item.review || 'No review text'}</li>`).join("")}
     </ul>
   `;
 }

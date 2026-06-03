@@ -51,7 +51,7 @@ html.theme-cyberpunk { --bg:#05030a; --text:#f3e8ff; --muted:#b39ddf; --panel-bg
 html.theme-rustic { --bg:#080608; --text:#ffe9db; --muted:#b88a78; --panel-bg:#0b0b0b; --border:#33221a; --accent:#ff6f3c; --accent-text:#1b0700; --preview-bg: rgba(8,4,4,0.95); }
 
 /* Shallows theme — softened light blue */
-html.theme-shallows { --bg:#d2e8f0; --text:#06324a; --muted:#5a8fa3; --panel-bg:#c4dde8; --border:#a8cdd9; --accent:#0096be; --accent-text:#eef9ff; --preview-bg: rgba(2,40,60,0.95); }
+html.theme-shallows { --bg:#e8f4f8; --text:#1a4a6a; --muted:#7ab8d0; --panel-bg:#f0f8fc; --border:#c8e0f0; --accent:#4db8e0; --accent-text:#ffffff; --preview-bg: rgba(26,74,106,0.95); }
 
 /* Ocean theme: dark blue base with light blue accents */
 html.theme-ocean { --bg:#041828; --text:#c8ecff; --muted:#6a9fc4; --panel-bg:#062238; --border:#0f3d5c; --accent:#5dd4ff; --accent-text:#041828; --preview-bg: rgba(4,24,40,0.95); }
@@ -74,7 +74,7 @@ html.theme-hatsune::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('miku2.jpg');
+  background-image: url('miku2.png');
   background-repeat: no-repeat;
   background-position: right 10% center;
   background-size: contain;
@@ -188,6 +188,41 @@ html.theme-meiko::before {
   /* Make cute theme pink more pastel on mobile */
   html.theme-cute {
     --bg: #ffdde7;
+  }
+  
+  /* Admin panel mobile responsiveness */
+  #adminPanel {
+    flex-direction: column;
+    height: auto;
+    min-height: 500px;
+  }
+  #adminPanel > div[style*="display:flex"] {
+    flex-direction: column;
+    height: auto;
+  }
+  #adminPanel > div > div:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding-right: 0;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+  }
+  #adminPanel > div > div:last-child {
+    flex: none;
+  }
+  #userList {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  #userData {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  #userData > div {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+  }
+  #userData > div > div > div > img {
+    height: 120px !important;
   }
 }
 
