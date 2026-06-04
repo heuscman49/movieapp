@@ -1324,7 +1324,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reviewsSort = document.getElementById('reviewsSort');
   const reviewsPage = document.getElementById('reviewsPage');
   const settingsPage = document.getElementById('settingsPage');
-  const backdrop = overlayBackdrop();
+  const backdrop = document.getElementById('overlayBackdrop');
 
   if (openReviewsBtn) {
     openReviewsBtn.onclick = () => {
