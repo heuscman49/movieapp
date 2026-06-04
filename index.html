@@ -88,6 +88,10 @@
           <button id="openAdminBtn" class="side-btn" title="Admin Dashboard" type="button">🛠</button>
           <span class="side-label">Admin</span>
         </div>
+        <div class="side-item" data-action="admin-users" style="display:none;">
+          <button id="openAdminUsersBtn" class="side-btn" title="View Users" type="button">👥</button>
+          <span class="side-label">Users</span>
+        </div>
       </div>
     </aside>
 
@@ -268,6 +272,37 @@
 
     </div>
 
+  </div>
+
+  <!-- Admin Users List Overlay Page -->
+  <div id="adminUsersPanel" class="overlay-page">
+    <button class="mobile-close-btn" style="display:none; position:absolute; top:12px; right:12px; background:var(--panel-bg); color:var(--text); border:1px solid var(--border); border-radius:6px; width:32px; height:32px; font-size:18px; cursor:pointer; z-index:10;">×</button>
+    <h2>👥 All Users</h2>
+    <div id="adminUsersGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:15px; padding:20px; max-height:600px; overflow-y:auto;"></div>
+  </div>
+
+  <!-- Admin User Detail Overlay Page -->
+  <div id="adminUserDetailPanel" class="overlay-page">
+    <button class="mobile-close-btn" style="display:none; position:absolute; top:12px; right:12px; background:var(--panel-bg); color:var(--text); border:1px solid var(--border); border-radius:6px; width:32px; height:32px; font-size:18px; cursor:pointer; z-index:10;">×</button>
+    <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
+      <button id="backToUsersBtn" style="padding:8px 16px; border-radius:6px; border:1px solid var(--border); background:var(--panel-bg); color:var(--text); cursor:pointer;">← Back to Users</button>
+      <h2 id="userDetailName" style="margin:0;">User Details</h2>
+      <button id="userReviewsBtn" style="padding:8px 16px; border-radius:6px; border:1px solid var(--border); background:var(--panel-bg); color:var(--text); cursor:pointer;">📝 Reviews</button>
+    </div>
+    <div id="userDetailContent" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div>
+        <h3 style="color:var(--text);">🎬 Movies to Watch</h3>
+        <div id="userMoviesGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:400px; overflow-y:auto;"></div>
+      </div>
+      <div>
+        <h3 style="color:var(--text);">📺 Shows to Watch</h3>
+        <div id="userShowsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:400px; overflow-y:auto;"></div>
+      </div>
+    </div>
+    <div id="userReviewsContent" style="display:none;">
+      <h3 style="color:var(--text);">📝 User Reviews</h3>
+      <div id="userReviewsList" style="max-height:400px; overflow-y:auto;"></div>
+    </div>
   </div>
 
   <!-- Mouse trails -->

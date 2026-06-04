@@ -484,7 +484,8 @@ function checkAdmin(user) {
   if (user && user.email === "georgebossingto@gmail.com") {
     const adminBtn = document.getElementById('openAdminBtn');
     if (adminBtn) adminBtn.style.display = 'flex';
-    loadUsers();
+    const adminUsersBtn = document.getElementById('openAdminUsersBtn');
+    if (adminUsersBtn) adminUsersBtn.style.display = 'flex';
   }
 }
 
@@ -926,6 +927,130 @@ async function loadUsers() {
   console.log("✅ users loaded:", snapshot.size);
 }
 
+async function loadAdminUsers() {
+  console.log("🔄 loading admin users...");
+
+  const snapshot = await getDocs(collection(db, "users"));
+
+  const usersGrid = document.getElementById("adminUsersGrid");
+  usersGrid.innerHTML = "";
+
+  if (snapshot.empty) {
+    usersGrid.innerHTML = "<div style='color:var(--text);'>❌ No users found in Firestore</div>";
+    return;
+  }
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    const card = document.createElement("div");
+    card.style.background = "var(--panel-bg)";
+    card.style.border = "1px solid var(--border)";
+    card.style.borderRadius = "8px";
+    card.style.padding = "15px";
+    card.style.textAlign = "center";
+    card.style.cursor = "pointer";
+    card.style.color = "var(--text)";
+    card.style.transition = "transform 0.2s, box-shadow 0.2s";
+
+    card.innerHTML = `
+      <div style="font-size:40px; margin-bottom:8px;">👤</div>
+      <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${data.name || 'Unknown'}</div>
+      <div style="font-size:12px; color:var(--muted);">${data.email || ''}</div>
+    `;
+
+    card.onclick = () => showAdminUserDetail(docSnap.id, data);
+
+    card.onmouseenter = () => {
+      card.style.transform = "translateY(-4px)";
+      card.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+    };
+    card.onmouseleave = () => {
+      card.style.transform = "translateY(0)";
+      card.style.boxShadow = "none";
+    };
+
+    usersGrid.appendChild(card);
+  });
+
+  console.log("✅ admin users loaded:", snapshot.size);
+}
+
+async function showAdminUserDetail(uid, data) {
+  const panel = document.getElementById("adminUserDetailPanel");
+  const nameEl = document.getElementById("userDetailName");
+  const moviesGrid = document.getElementById("userMoviesGrid");
+  const showsGrid = document.getElementById("userShowsGrid");
+  const reviewsList = document.getElementById("userReviewsList");
+  const detailContent = document.getElementById("userDetailContent");
+  const reviewsContent = document.getElementById("userReviewsContent");
+
+  nameEl.textContent = data.name || 'Unknown User';
+  detailContent.style.display = "grid";
+  reviewsContent.style.display = "none";
+
+  // Load movies
+  moviesGrid.innerHTML = "";
+  const movies = data.movies || [];
+  movies.forEach(item => {
+    const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
+    const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
+    const card = document.createElement("div");
+    card.style.background = "var(--panel-bg)";
+    card.style.border = "1px solid var(--border)";
+    card.style.borderRadius = "6px";
+    card.style.padding = "8px";
+    card.style.textAlign = "center";
+    card.innerHTML = `
+      ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
+      <div style="color:var(--text); font-size:11px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
+    `;
+    moviesGrid.appendChild(card);
+  });
+
+  // Load shows
+  showsGrid.innerHTML = "";
+  const shows = data.shows || [];
+  shows.forEach(item => {
+    const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
+    const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
+    const card = document.createElement("div");
+    card.style.background = "var(--panel-bg)";
+    card.style.border = "1px solid var(--border)";
+    card.style.borderRadius = "6px";
+    card.style.padding = "8px";
+    card.style.textAlign = "center";
+    card.innerHTML = `
+      ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
+      <div style="color:var(--text); font-size:11px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
+    `;
+    showsGrid.appendChild(card);
+  });
+
+  // Load reviews
+  reviewsList.innerHTML = "";
+  const reviews = data.reviews || [];
+  reviews.forEach(item => {
+    const reviewItem = document.createElement("div");
+    reviewItem.style.background = "var(--panel-bg)";
+    reviewItem.style.border = "1px solid var(--border)";
+    reviewItem.style.borderRadius = "6px";
+    reviewItem.style.padding = "10px";
+    reviewItem.style.marginBottom = "10px";
+    reviewItem.innerHTML = `
+      <div style="color:var(--text); font-weight:600; margin-bottom:4px;">${item.title || 'Unknown'}</div>
+      <div style="color:var(--accent); font-size:14px; margin-bottom:4px;">⭐ ${item.rating}/5</div>
+      <div style="color:var(--muted); font-size:13px;">${item.review || 'No review text'}</div>
+    `;
+    reviewsList.appendChild(reviewItem);
+  });
+
+  // Show user detail panel
+  hideOverlayPages();
+  panel.style.display = "block";
+  document.getElementById("overlayBackdrop").style.display = "block";
+}
+
 async function showUserData(uid) {
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
@@ -1211,7 +1336,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const openAdminBtn = document.getElementById('openAdminBtn');
   const adminPanel = document.getElementById('adminPanel');
   if (openAdminBtn && adminPanel) {
-    openAdminBtn.onclick = () => toggleOverlayPage(adminPanel);
+    openAdminBtn.onclick = () => {
+      loadUsers();
+      toggleOverlayPage(adminPanel);
+    };
+  }
+
+  // Admin users button
+  const openAdminUsersBtn = document.getElementById('openAdminUsersBtn');
+  const adminUsersPanel = document.getElementById('adminUsersPanel');
+  if (openAdminUsersBtn && adminUsersPanel) {
+    openAdminUsersBtn.onclick = () => {
+      loadAdminUsers();
+      toggleOverlayPage(adminUsersPanel);
+    };
+  }
+
+  // Back to users button
+  const backToUsersBtn = document.getElementById('backToUsersBtn');
+  if (backToUsersBtn) {
+    backToUsersBtn.onclick = () => {
+      hideOverlayPages();
+      adminUsersPanel.style.display = "block";
+      document.getElementById("overlayBackdrop").style.display = "block";
+    };
+  }
+
+  // User reviews button
+  const userReviewsBtn = document.getElementById('userReviewsBtn');
+  if (userReviewsBtn) {
+    userReviewsBtn.onclick = () => {
+      const detailContent = document.getElementById("userDetailContent");
+      const reviewsContent = document.getElementById("userReviewsContent");
+      detailContent.style.display = "none";
+      reviewsContent.style.display = "block";
+    };
   }
 
   // Edit review button

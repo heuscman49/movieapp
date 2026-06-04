@@ -227,6 +227,22 @@ html.theme-meiko::before {
   #userData > div > div > div > img {
     height: 120px !important;
   }
+
+  /* Admin users panel mobile responsiveness */
+  #adminUsersGrid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
+
+  /* Admin user detail panel mobile responsiveness */
+  #userDetailContent {
+    grid-template-columns: 1fr !important;
+  }
+  #userMoviesGrid, #userShowsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+  }
+  #userMoviesGrid > div > img, #userShowsGrid > div > img {
+    height: 100px !important;
+  }
 }
 
 .side-icons {
