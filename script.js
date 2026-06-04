@@ -2037,5 +2037,4 @@ document.addEventListener("click", (e) => {
 });
 
 // Make functions accessible to HTML buttons
-window.addMovie = addMovie;
-window.addShow = addShow;
+window.addMedia = addMedia;
