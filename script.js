@@ -1084,28 +1084,58 @@ async function showUserData(uid) {
     <div id="userDataContent">
       <h4 style="color:var(--text);">🎬 Movies to Watch (${(data.movies || []).length})</h4>
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
-      ${(data.movies || []).map(item => {
+      ${(data.movies || []).map((item, index) => {
         const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
         const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
         return `
-          <div style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center;">
+          <div id="movie-${index}" style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;">
             ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
             <div style="color:var(--text); font-size:12px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
           </div>
+          <script>
+            (function() {
+              const card = document.getElementById('movie-${index}');
+              if (card) {
+                card.onmouseenter = () => {
+                  card.style.transform = 'translateY(-4px)';
+                  card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                };
+                card.onmouseleave = () => {
+                  card.style.transform = 'translateY(0)';
+                  card.style.boxShadow = 'none';
+                };
+              }
+            })();
+          <\/script>
         `;
       }).join("")}
     </div>
 
     <h4 style="color:var(--text);">📺 Shows to Watch (${(data.shows || []).length})</h4>
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
-      ${(data.shows || []).map(item => {
+      ${(data.shows || []).map((item, index) => {
         const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
         const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
         return `
-          <div style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center;">
+          <div id="show-${index}" style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;">
             ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:150px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
             <div style="color:var(--text); font-size:12px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
           </div>
+          <script>
+            (function() {
+              const card = document.getElementById('show-${index}');
+              if (card) {
+                card.onmouseenter = () => {
+                  card.style.transform = 'translateY(-4px)';
+                  card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                };
+                card.onmouseleave = () => {
+                  card.style.transform = 'translateY(0)';
+                  card.style.boxShadow = 'none';
+                };
+              }
+            })();
+          <\/script>
         `;
       }).join("")}
     </div>
