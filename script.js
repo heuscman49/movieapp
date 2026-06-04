@@ -1004,7 +1004,7 @@ async function showAdminUserDetail(uid, data) {
   const movies = data.movies || [];
   movies.forEach(item => {
     const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
-    const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
+    const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : (item.poster ? item.poster : '')) : '';
     const card = document.createElement("div");
     card.style.background = "var(--panel-bg)";
     card.style.border = "1px solid var(--border)";
@@ -1012,7 +1012,7 @@ async function showAdminUserDetail(uid, data) {
     card.style.padding = "8px";
     card.style.textAlign = "center";
     card.innerHTML = `
-      ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
+      ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:6px;" onerror="this.style.display='none';">` : ''}
       <div style="color:var(--text); font-size:11px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
     `;
     moviesGrid.appendChild(card);
@@ -1023,7 +1023,7 @@ async function showAdminUserDetail(uid, data) {
   const shows = data.shows || [];
   shows.forEach(item => {
     const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
-    const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '') : '';
+    const poster = (item && typeof item === 'object') ? (item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : (item.poster ? item.poster : '')) : '';
     const card = document.createElement("div");
     card.style.background = "var(--panel-bg)";
     card.style.border = "1px solid var(--border)";
@@ -1031,7 +1031,7 @@ async function showAdminUserDetail(uid, data) {
     card.style.padding = "8px";
     card.style.textAlign = "center";
     card.innerHTML = `
-      ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:6px;">` : ''}
+      ${poster ? `<img src="${poster}" alt="${title}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:6px;" onerror="this.style.display='none';">` : ''}
       <div style="color:var(--text); font-size:11px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${title}</div>
     `;
     showsGrid.appendChild(card);
@@ -1327,10 +1327,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const backdrop = overlayBackdrop();
 
   if (openReviewsBtn) {
-    openReviewsBtn.onclick = () => toggleOverlayPage(reviewsPage);
+    openReviewsBtn.onclick = () => {
+      toggleOverlayPage(reviewsPage);
+      applyTheme(currentTheme);
+    };
   }
   if (openSettingsBtn) {
-    openSettingsBtn.onclick = () => toggleOverlayPage(settingsPage);
+    openSettingsBtn.onclick = () => {
+      toggleOverlayPage(settingsPage);
+      applyTheme(currentTheme);
+    };
   }
   if (backdrop) {
     backdrop.addEventListener('click', hideOverlayPages);
@@ -1349,6 +1355,7 @@ document.addEventListener('DOMContentLoaded', () => {
     openAdminBtn.onclick = () => {
       loadUsers();
       toggleOverlayPage(adminPanel);
+      applyTheme(currentTheme);
     };
   }
 
@@ -1359,7 +1366,14 @@ document.addEventListener('DOMContentLoaded', () => {
     openAdminUsersBtn.onclick = () => {
       loadAdminUsers();
       toggleOverlayPage(adminUsersPanel);
+      applyTheme(currentTheme);
     };
+  }
+
+  // Click outside to close overlay pages
+  const overlayBackdrop = document.getElementById('overlayBackdrop');
+  if (overlayBackdrop) {
+    overlayBackdrop.onclick = () => hideOverlayPages();
   }
 
   // Back to users button
