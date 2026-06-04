@@ -1075,11 +1075,14 @@ async function showUserData(uid) {
   const data = snap.data();
 
   if (box) box.innerHTML = `
-    <h3 style="color:var(--text);">👤 ${data.name}</h3>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+      <h3 style="color:var(--text); margin:0;">👤 ${data.name}</h3>
+      <button id="viewUserReviewsBtn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:var(--panel-bg); color:var(--text); cursor:pointer; font-size:14px;">📝 View Reviews</button>
+      <button id="viewUserDataBtn" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:var(--panel-bg); color:var(--text); cursor:pointer; font-size:14px; display:none;">📊 View Data</button>
+    </div>
 
-    <p style="color:var(--text);"><b>Email:</b> ${data.email}</p>
-
-    <h4 style="color:var(--text);">🎬 Movies to Watch (${(data.movies || []).length})</h4>
+    <div id="userDataContent">
+      <h4 style="color:var(--text);">🎬 Movies to Watch (${(data.movies || []).length})</h4>
     <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; max-height:200px; overflow-y:auto; margin-bottom:15px;">
       ${(data.movies || []).map(item => {
         const title = (item && typeof item === 'object') ? (item.title || item.name || 'Unknown title') : item;
@@ -1127,7 +1130,45 @@ async function showUserData(uid) {
     <ul style="color:var(--text); padding-left:1.25rem; max-height:150px; overflow-y:auto;">
       ${(data.reviews || []).map(item => `<li><b>${item.title || 'Unknown'}</b> - ${item.rating}/5 stars: ${item.review || 'No review text'}</li>`).join("")}
     </ul>
+    </div>
+
+    <div id="userReviewsContent" style="display:none;">
+      <h4 style="color:var(--text);">📝 Reviews (${(data.reviews || []).length})</h4>
+      <div style="display:grid; gap:10px; max-height:400px; overflow-y:auto;">
+        ${(data.reviews || []).map(item => `
+          <div style="background:var(--panel-bg); border:1px solid var(--border); border-radius:6px; padding:12px;">
+            <div style="color:var(--text); font-weight:600; margin-bottom:4px;">${item.title || 'Unknown'}</div>
+            <div style="color:var(--accent); font-size:14px; margin-bottom:4px;">⭐ ${item.rating}/5</div>
+            <div style="color:var(--muted); font-size:13px;">${item.review || 'No review text'}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
   `;
+
+  // Add event listeners for toggle buttons
+  const viewReviewsBtn = document.getElementById('viewUserReviewsBtn');
+  const viewDataBtn = document.getElementById('viewUserDataBtn');
+  const userDataContent = document.getElementById('userDataContent');
+  const userReviewsContent = document.getElementById('userReviewsContent');
+
+  if (viewReviewsBtn) {
+    viewReviewsBtn.onclick = () => {
+      userDataContent.style.display = 'none';
+      userReviewsContent.style.display = 'block';
+      viewReviewsBtn.style.display = 'none';
+      viewDataBtn.style.display = 'inline-block';
+    };
+  }
+
+  if (viewDataBtn) {
+    viewDataBtn.onclick = () => {
+      userDataContent.style.display = 'block';
+      userReviewsContent.style.display = 'none';
+      viewDataBtn.style.display = 'none';
+      viewReviewsBtn.style.display = 'inline-block';
+    };
+  }
 }
 
 // LOGIN
