@@ -481,11 +481,21 @@ window.saveEditedReview = async (index) => {
 
 
 function checkAdmin(user) {
+  console.log("Checking admin for user:", user ? user.email : "no user");
   if (user && user.email === "georgebossingto@gmail.com") {
+    console.log("Admin detected, showing buttons");
     const adminBtn = document.getElementById('openAdminBtn');
-    if (adminBtn) adminBtn.style.display = 'flex';
+    if (adminBtn) {
+      adminBtn.style.display = 'flex';
+      console.log("Admin button shown");
+    }
     const adminUsersBtn = document.getElementById('openAdminUsersBtn');
-    if (adminUsersBtn) adminUsersBtn.style.display = 'flex';
+    if (adminUsersBtn) {
+      adminUsersBtn.style.display = 'flex';
+      console.log("Admin users button shown");
+    }
+  } else {
+    console.log("Not admin or no user");
   }
 }
 
