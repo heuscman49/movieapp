@@ -1155,11 +1155,6 @@ async function showUserData(uid) {
         `;
       }).join("")}
     </div>
-
-    <h4 style="color:var(--text);">📝 Reviews (${(data.reviews || []).length})</h4>
-    <ul style="color:var(--text); padding-left:1.25rem; max-height:150px; overflow-y:auto;">
-      ${(data.reviews || []).map(item => `<li><b>${item.title || 'Unknown'}</b> - ${item.rating}/5 stars: ${item.review || 'No review text'}</li>`).join("")}
-    </ul>
     </div>
 
     <div id="userReviewsContent" style="display:none;">
@@ -1182,8 +1177,11 @@ async function showUserData(uid) {
   const userDataContent = document.getElementById('userDataContent');
   const userReviewsContent = document.getElementById('userReviewsContent');
 
+  console.log("Reviews data:", data.reviews);
+
   if (viewReviewsBtn) {
     viewReviewsBtn.onclick = () => {
+      console.log("View reviews clicked");
       userDataContent.style.display = 'none';
       userReviewsContent.style.display = 'block';
       viewReviewsBtn.style.display = 'none';
@@ -1193,6 +1191,7 @@ async function showUserData(uid) {
 
   if (viewDataBtn) {
     viewDataBtn.onclick = () => {
+      console.log("View data clicked");
       userDataContent.style.display = 'block';
       userReviewsContent.style.display = 'none';
       viewDataBtn.style.display = 'none';
