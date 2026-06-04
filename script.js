@@ -486,12 +486,12 @@ function checkAdmin(user) {
     console.log("Admin detected, showing buttons");
     const adminBtn = document.getElementById('openAdminBtn');
     if (adminBtn) {
-      adminBtn.style.display = 'flex';
+      adminBtn.parentElement.style.display = 'flex';
       console.log("Admin button shown");
     }
     const adminUsersBtn = document.getElementById('openAdminUsersBtn');
     if (adminUsersBtn) {
-      adminUsersBtn.style.display = 'flex';
+      adminUsersBtn.parentElement.style.display = 'flex';
       console.log("Admin users button shown");
     }
   } else {
