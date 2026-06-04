@@ -149,9 +149,9 @@ async function addMedia(item) {
 
   const mediaObject = {
     title: item.title || item.name,
-    poster: item.poster_path,
+    poster_path: item.poster_path,
     overview: item.overview || "",
-    date: item.release_date || item.first_air_date || "",
+    release_date: item.release_date || item.first_air_date || "",
     rating: null,
     watched: false,
     review: "",
@@ -160,18 +160,18 @@ async function addMedia(item) {
 
   if (isMovie) {
     try {
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         movies: arrayUnion(mediaObject)
-      });
+      }, { merge: true });
       console.log("Saved to Firestore");
     } catch (err) {
       console.error("Firestore error:", err);
     }
   } else {
     try {
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         shows: arrayUnion(mediaObject)
-      });
+      }, { merge: true });
       console.log("Saved to Firestore");
     } catch (err) {
       console.error("Firestore error:", err);
